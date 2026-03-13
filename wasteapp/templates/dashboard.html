@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waste-Not – Circular Economy Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2330;
+    --border: #30363d;
+    --green: #3fb950;
+    --green-dim: #1a3a23;
+    --green-glow: rgba(63,185,80,0.15);
+    --accent: #58a6ff;
+    --warn: #e3b341;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --red: #f85149;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── NAVBAR ── */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nav-icon {
+    width: 32px; height: 32px;
+    background: var(--green);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-size: 16px;
+  }
+
+  .nav-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.3px;
+  }
+
+  .nav-title span { color: var(--green); }
+
+  .nav-badge {
+    background: var(--green-dim);
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    border: 1px solid var(--green);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-left: 8px;
+  }
+
+  .nav-actions { display: flex; gap: 10px; align-items: center; }
+
+  .btn {
+    padding: 7px 18px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+
+  .btn-primary {
+    background: var(--green);
+    color: #0d1117;
+    font-weight: 600;
+  }
+  .btn-primary:hover { background: #4fc762; transform: translateY(-1px); }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  /* ── STAT PILLS ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: var(--green); }
+
+  .stat-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .stat-label { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+  .stat-value { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; }
+  .stat-delta { font-size: 11px; color: var(--green); margin-top: 2px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.4rem;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 1.2rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title::before {
+    content: '';
+    display: inline-block;
+    width: 3px; height: 14px;
+    background: var(--green);
+    border-radius: 2px;
+  }
+
+  /* ── CHARTS GRID ── */
+  .main-chart { margin-bottom: 1.5rem; }
+
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  thead tr {
+    border-bottom: 1px solid var(--border);
+  }
+
+  thead th {
+    text-align: left;
+    padding: 10px 14px;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    transition: background 0.15s;
+  }
+  tbody tr:hover { background: var(--surface2); }
+  tbody tr:last-child { border-bottom: none; }
+
+  td { padding: 12px 14px; }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .badge-plastic { background: rgba(248,81,73,0.15); color: #f85149; }
+  .badge-wood    { background: rgba(227,179,65,0.15); color: #e3b341; }
+  .badge-metal   { background: rgba(88,166,255,0.15); color: #58a6ff; }
+  .badge-paper   { background: rgba(63,185,80,0.15);  color: #3fb950; }
+
+  .location-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--muted);
+  }
+  .location-dot::before {
+    content: '◉';
+    font-size: 9px;
+    color: var(--green);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .stat-card  { animation: fadeUp 0.4s ease both; }
+  .stat-card:nth-child(1) { animation-delay: 0.05s; }
+  .stat-card:nth-child(2) { animation-delay: 0.10s; }
+  .stat-card:nth-child(3) { animation-delay: 0.15s; }
+  .stat-card:nth-child(4) { animation-delay: 0.20s; }
+
+  .main-chart { animation: fadeUp 0.4s 0.25s ease both; }
+  .charts-grid .card:nth-child(1) { animation: fadeUp 0.4s 0.30s ease both; }
+  .charts-grid .card:nth-child(2) { animation: fadeUp 0.4s 0.35s ease both; }
+  .charts-grid .card:nth-child(3) { animation: fadeUp 0.4s 0.40s ease both; }
+  .card.table-card { animation: fadeUp 0.4s 0.45s ease both; }
+
+  @media (max-width: 900px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .charts-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-icon">♻️</div>
+    <span class="nav-title">Waste<span>-Not</span></span>
+    <span class="nav-badge">Live</span>
+  </div>
+  <div class="nav-actions">
+    <button class="btn btn-ghost">Sign up</button>
+    <button class="btn btn-primary">Login</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- STAT PILLS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(63,185,80,0.12)">🗂️</div>
+      <div>
+        <div class="stat-label">Total Waste Tracked</div>
+        <div class="stat-value">1,820 <span style="font-size:13px;color:var(--muted)">kg</span></div>
+        <div class="stat-delta">↑ 12% this month</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(88,166,255,0.12)">🏭</div>
+      <div>
+        <div class="stat-label">Active Companies</div>
+        <div class="stat-value">5</div>
+        <div class="stat-delta">↑ 2 new this week</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(227,179,65,0.12)">📋</div>
+      <div>
+        <div class="stat-label">Open Requirements</div>
+        <div class="stat-value">5</div>
+        <div class="stat-delta" style="color:var(--warn)">3 urgent</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(248,81,73,0.12)">♻️</div>
+      <div>
+        <div class="stat-label">Recycling Rate</div>
+        <div class="stat-value">68<span style="font-size:13px">%</span></div>
+        <div class="stat-delta">↑ 4% vs last month</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP HISTOGRAM -->
+  <div class="card main-chart">
+    <div class="card-title">Top 5 Waste Producing Companies</div>
+    <canvas id="topCompanies" height="80"></canvas>
+  </div>
+
+  <!-- 3 CHARTS -->
+  <div class="charts-grid">
+    <div class="card">
+      <div class="card-title">Available Waste Material</div>
+      <canvas id="availableWaste"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Monthly Waste Trend</div>
+      <canvas id="monthlyTrend"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Waste Distribution</div>
+      <canvas id="wasteType"></canvas>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="card table-card">
+    <div class="card-title" style="margin-bottom:1rem">Consumer Requirements</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Waste Type</th>
+            <th>Quantity</th>
+            <th>Location</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Recycling Plant</strong></td>
+            <td><span class="badge badge-plastic">Plastic</span></td>
+            <td>200 kg</td>
+            <td><span class="location-dot">Delhi</span></td>
+            <td style="color:var(--muted)">12 Mar</td>
+          </tr>
+          <tr>
+            <td><strong>Furniture Maker</strong></td>
+            <td><span class="badge badge-wood">Wood</span></td>
+            <td>150 kg</td>
+            <td><span class="location-dot">Gurgaon</span></td>
+            <td style="color:var(--muted)">13 Mar</td>
+          </tr>
+          <tr>
+            <td><strong>Metal Factory</strong></td>
+            <td><span class="badge badge-metal">Metal</span></td>
+            <td>100 kg</td>
+            <td><span class="location-dot">Noida</span></td>
+            <td style="color:var(--muted)">13 Mar</td>
+          </tr>
+          <tr>
+            <td><strong>Paper Mill</strong></td>
+            <td><span class="badge badge-paper">Paper</span></td>
+            <td>300 kg</td>
+            <td><span class="location-dot">Delhi</span></td>
+            <td style="color:var(--muted)">14 Mar</td>
+          </tr>
+          <tr>
+            <td><strong>Plastic Industry</strong></td>
+            <td><span class="badge badge-plastic">Plastic</span></td>
+            <td>250 kg</td>
+            <td><span class="location-dot">Faridabad</span></td>
+            <td style="color:var(--muted)">15 Mar</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const dark = {
+    color: '#e6edf3',
+    grid: 'rgba(48,54,61,0.6)',
+    tick: '#7d8590'
+  };
+
+  Chart.defaults.color = dark.tick;
+  Chart.defaults.font.family = "'DM Sans', sans-serif";
+
+  const commonScales = {
+    x: { grid: { color: dark.grid }, ticks: { color: dark.tick } },
+    y: { grid: { color: dark.grid }, ticks: { color: dark.tick } }
+  };
+
+  // TOP HISTOGRAM
+  new Chart(document.getElementById("topCompanies"), {
+    type: "bar",
+    data: {
+      labels: ["CocaCola", "Amazon", "Nestle", "Pepsi", "Unilever"],
+      datasets: [{
+        label: "Waste Produced (kg)",
+        data: [500, 420, 350, 300, 250],
+        backgroundColor: [
+          "rgba(63,185,80,0.85)",
+          "rgba(63,185,80,0.70)",
+          "rgba(63,185,80,0.55)",
+          "rgba(63,185,80,0.40)",
+          "rgba(63,185,80,0.28)"
+        ],
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: commonScales
+    }
+  });
+
+  // AVAILABLE WASTE
+  new Chart(document.getElementById("availableWaste"), {
+    type: "pie",
+    data: {
+      labels: ["Plastic", "Paper", "Metal", "Organic"],
+      datasets: [{
+        data: [40, 25, 20, 15],
+        backgroundColor: ["#f85149", "#58a6ff", "#e3b341", "#3fb950"],
+        borderColor: "#161b22",
+        borderWidth: 3
+      }]
+    },
+    options: { plugins: { legend: { position: 'bottom', labels: { padding: 16, boxWidth: 12 } } } }
+  });
+
+  // MONTHLY TREND
+  new Chart(document.getElementById("monthlyTrend"), {
+    type: "line",
+    data: {
+      labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+      datasets: [{
+        label: "Waste Produced",
+        data: [200, 300, 450, 400, 550, 700],
+        borderColor: "#3fb950",
+        backgroundColor: "rgba(63,185,80,0.08)",
+        pointBackgroundColor: "#3fb950",
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: commonScales
+    }
+  });
+
+  // WASTE TYPE
+  new Chart(document.getElementById("wasteType"), {
+    type: "doughnut",
+    data: {
+      labels: ["Plastic", "Paper", "Metal", "Organic"],
+      datasets: [{
+        data: [35, 30, 20, 15],
+        backgroundColor: ["#f85149", "#58a6ff", "#e3b341", "#3fb950"],
+        borderColor: "#161b22",
+        borderWidth: 3,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      cutout: "68%",
+      plugins: { legend: { position: 'bottom', labels: { padding: 16, boxWidth: 12 } } }
+    }
+  });
+</script>
+</body>
+</html>
