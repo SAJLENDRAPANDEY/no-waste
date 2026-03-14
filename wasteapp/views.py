@@ -11,8 +11,8 @@ from django.conf import settings
 # ---------------- DASHBOARD ----------------
 
 def dashboard(request):
-    waste = Waste.objects.all()
-    available_stock = Waste.objects.filter(status="Produced")  # sidebar stock
+    waste           = Waste.objects.all()
+    available_stock = Waste.objects.filter(status="Produced")
 
     total    = waste.aggregate(Sum('quantity'))['quantity__sum'] or 0
     recycled = waste.filter(status="Recycled").aggregate(Sum('quantity'))['quantity__sum'] or 0
@@ -79,7 +79,7 @@ def producer_page(request):
                 waste_type = waste_type,
                 quantity   = quantity,
                 date       = date,
-                status     = "Produced"   # ✅ yeh line missing thi — isliye dashboard mein nahi dikha raha tha
+                status     = "Produced"
             )
             return redirect('dashboard')
 
@@ -89,7 +89,7 @@ def producer_page(request):
 # ---------------- CONSUMER ----------------
 
 def consumer_page(request):
-    waste_data = Waste.objects.filter(status="Produced")  # ✅ sirf available stock dikhao
+    waste_data = Waste.objects.filter(status="Produced")
 
     return render(request, "consumer.html", {
         "data": waste_data
@@ -107,13 +107,21 @@ def request_waste(request, id):
         quantity       = request.POST.get('quantity')
         message        = request.POST.get('message')
 
+        # ✅ empty fields check
         if not all([consumer_name, consumer_email, quantity, message]):
             return render(request, "request.html", {
                 'waste': waste,
                 'error': 'Please fill in all fields'
             })
 
-        # ✅ Producer ko notification — consumer ne request ki
+        # ✅ quantity validation
+        if int(quantity) > waste.quantity:
+            return render(request, "request.html", {
+                'waste': waste,
+                'error': f'Maximum available quantity is {waste.quantity} kg'
+            })
+
+        # ✅ Producer ko mail
         send_mail(
             subject        = f'New Waste Request from {consumer_name}',
             message        = f'''
@@ -134,7 +142,7 @@ Please respond to the consumer directly at: {consumer_email}
             fail_silently  = False,
         )
 
-        # ✅ Consumer ko Thank You mail — company ke naam se
+        # ✅ Consumer ko Thank You mail
         send_mail(
             subject        = f'Thank You for Your Request – {waste.company}',
             message        = f'''
@@ -154,10 +162,14 @@ Best Regards,
 {waste.company}
             ''',
             from_email     = settings.EMAIL_HOST_USER,
-            recipient_list = [consumer_email],  # ✅ consumer ke mail pe
+            recipient_list = [consumer_email],
             fail_silently  = False,
         )
 
-        return redirect('dashboard')
+        # ✅ redirect nahi — same page pe success message dikhe
+        return render(request, "request.html", {
+            'waste': waste,
+            'sent' : True
+        })
 
     return render(request, "request.html", {'waste': waste})
