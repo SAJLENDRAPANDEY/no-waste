@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request Waste</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d1117;
+      color: #e6edf3;
+      font-family: sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 16px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.75rem;
+    }
+
+    .header-icon {
+      width: 38px; height: 38px;
+      background: rgba(63,185,80,0.12);
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+    }
+
+    .card-header h1 { font-size: 20px; font-weight: 700; color: #e6edf3; margin-bottom: 2px; }
+    .card-header p  { font-size: 13px; color: #7d8590; }
+
+    .waste-info {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 1.4rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .info-item label {
+      font-size: 11px;
+      color: #7d8590;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .info-item span { font-size: 14px; font-weight: 500; color: #e6edf3; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-plastic  { background: rgba(248,81,73,0.15);  color: #f85149; }
+    .badge-paper    { background: rgba(63,185,80,0.15);   color: #3fb950; }
+    .badge-metal    { background: rgba(88,166,255,0.15);  color: #58a6ff; }
+    .badge-organic  { background: rgba(63,185,80,0.15);   color: #3fb950; }
+    .badge-chemical { background: rgba(227,179,65,0.15);  color: #e3b341; }
+    .badge-wood     { background: rgba(227,179,65,0.15);  color: #e3b341; }
+    .badge-other    { background: rgba(125,133,144,0.15); color: #7d8590; }
+
+    .form-group { display: flex; flex-direction: column; gap: 14px; }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: #7d8590;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      background: #0d1117;
+      color: #e6edf3;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: sans-serif;
+    }
+
+    .field input:focus,
+    .field textarea:focus { border-color: #3fb950; }
+
+    .field textarea { resize: vertical; min-height: 90px; }
+
+    .btn-row { display: flex; gap: 10px; margin-top: 6px; }
+
+    .btn-cancel {
+      flex: 1;
+      padding: 10px;
+      background: none;
+      color: #7d8590;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-cancel:hover { color: #e6edf3; border-color: #7d8590; }
+
+    .btn-submit {
+      flex: 2;
+      padding: 10px;
+      background: #3fb950;
+      color: #0d1117;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-submit:hover { opacity: 0.85; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="card-header">
+    <div class="header-icon">📨</div>
+    <div>
+      <h1>Request Waste</h1>
+      <p>Fill details — company will respond on your email</p>
+    </div>
+  </div>
+
+  {% if sent %}
+  <div style="background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.3);border-radius:8px;padding:12px 14px;margin-bottom:1rem;font-size:13px;color:#3fb950;">
+    ✅ Request sent! Check your email for confirmation from <strong>{{ waste.company }}</strong>.
+  </div>
+  {% endif %}
+
+  {% if error %}
+  <div style="background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.3);border-radius:8px;padding:10px 14px;margin-bottom:1rem;font-size:13px;color:#f85149;">
+    ⚠️ {{ error }}
+  </div>
+  {% endif %}
+
+  <!-- WASTE DETAILS -->
+  <div class="waste-info">
+    <div class="info-item">
+      <label>Company</label>
+      <span>{{ waste.company }}</span>
+    </div>
+    <div class="info-item">
+      <label>Waste Type</label>
+      <span class="badge badge-{{ waste.waste_type|lower }}">{{ waste.waste_type }}</span>
+    </div>
+    <div class="info-item">
+      <label>Available</label>
+      <span>{{ waste.quantity }} kg</span>
+    </div>
+    <div class="info-item">
+      <label>Date</label>
+      <span>{{ waste.date }}</span>
+    </div>
+  </div>
+
+  {% if not sent %}
+  <form method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+
+      <div class="field">
+        <label>Your Name</label>
+        <input type="text" name="consumer_name"
+               placeholder="Enter your full name">
+      </div>
+
+      <div class="field">
+        <label>Your Email</label>
+        <input type="email" name="consumer_email"
+               placeholder="Enter your email address">
+      </div>
+
+      <div class="field">
+        <label>Quantity Required (kg)</label>
+        <input type="number" name="quantity"
+               placeholder="e.g. 50" min="1" max="{{ waste.quantity }}">
+      </div>
+
+      <div class="field">
+        <label>Message</label>
+        <textarea name="message"
+                  placeholder="Write your requirements, pickup location, etc."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <a href="/consumer/" class="btn-cancel">Cancel</a>
+        <button type="submit" class="btn-submit">Send Request</button>
+      </div>
+
+    </div>
+  </form>
+  {% endif %}
+
+</div>
+
+</body>
+</html>

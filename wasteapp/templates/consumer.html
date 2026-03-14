@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Available Waste – Consumer</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d1117;
+      color: #e6edf3;
+      font-family: sans-serif;
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+    }
+
+    .table-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 14px;
+      padding: 1.4rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.2rem;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #e6edf3;
+    }
+
+    .card-title::before {
+      content: '';
+      display: inline-block;
+      width: 3px; height: 16px;
+      background: #3fb950;
+      border-radius: 2px;
+    }
+
+    .count-badge {
+      background: rgba(63,185,80,0.12);
+      color: #3fb950;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(63,185,80,0.3);
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead tr { border-bottom: 1px solid #30363d; }
+
+    thead th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #7d8590;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(48,54,61,0.5);
+      transition: background 0.15s;
+    }
+    tbody tr:hover   { background: #1c2330; }
+    tbody tr:last-child { border-bottom: none; }
+
+    td { padding: 13px 14px; }
+
+    .company-name { font-weight: 500; color: #e6edf3; }
+
+    .qty { color: #e6edf3; }
+    .qty span { color: #7d8590; font-size: 12px; }
+
+    /* WASTE TYPE BADGES */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-plastic  { background: rgba(248,81,73,0.15);  color: #f85149; }
+    .badge-paper    { background: rgba(63,185,80,0.15);   color: #3fb950; }
+    .badge-metal    { background: rgba(88,166,255,0.15);  color: #58a6ff; }
+    .badge-organic  { background: rgba(63,185,80,0.15);   color: #3fb950; }
+    .badge-chemical { background: rgba(227,179,65,0.15);  color: #e3b341; }
+    .badge-wood     { background: rgba(227,179,65,0.15);  color: #e3b341; }
+    .badge-other    { background: rgba(125,133,144,0.15); color: #7d8590; }
+
+    /* REQUEST BUTTON */
+    .btn-request {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(63,185,80,0.12);
+      color: #3fb950;
+      border: 1px solid rgba(63,185,80,0.3);
+      padding: 5px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-request:hover { background: rgba(63,185,80,0.22); }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #7d8590;
+      font-size: 14px;
+    }
+    .empty-state .icon { font-size: 32px; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+
+<div class="table-card">
+
+  <div class="card-header">
+    <div class="card-title">Available Waste Stock</div>
+    <span class="count-badge">{{ data|length }} Available</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>Waste Type</th>
+          <th>Quantity</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        {% for i in data %}
+        <tr>
+          <td class="company-name">{{ i.company }}</td>
+          <td>
+            <span class="badge badge-{{ i.waste_type|lower }}">
+              {{ i.waste_type }}
+            </span>
+          </td>
+          <td class="qty">{{ i.quantity }} <span>kg</span></td>
+          <td>
+            <a href="/request/{{ i.id }}/" class="btn-request">Request</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4">
+            <div class="empty-state">
+              <div class="icon">📦</div>
+              No waste stock available right now
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+</body>
+</html>

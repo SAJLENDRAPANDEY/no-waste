@@ -1,273 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Waste-Not – Circular Economy Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-  :root {
-    --bg: #0d1117;
-    --surface: #161b22;
-    --surface2: #1c2330;
-    --border: #30363d;
-    --green: #3fb950;
-    --green-dim: #1a3a23;
-    --green-glow: rgba(63,185,80,0.15);
-    --accent: #58a6ff;
-    --warn: #e3b341;
-    --text: #e6edf3;
-    --muted: #7d8590;
-    --red: #f85149;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waste-Not Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg:         #0d1117;
+      --surface:    #161b22;
+      --surface2:   #1c2330;
+      --border:     #30363d;
+      --green:      #3fb950;
+      --green-dim:  #1a3a23;
+      --accent:     #58a6ff;
+      --warn:       #e3b341;
+      --text:       #e6edf3;
+      --muted:      #7d8590;
+      --red:        #f85149;
+    }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-  }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+    }
 
-  /* ── NAVBAR ── */
-  nav {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    height: 64px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(10px);
-  }
+    /* ── NAVBAR ── */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-  .nav-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+    .nav-brand { display: flex; align-items: center; gap: 10px; }
 
-  .nav-icon {
-    width: 32px; height: 32px;
-    background: var(--green);
-    border-radius: 8px;
-    display: grid;
-    place-items: center;
-    font-size: 16px;
-  }
+    .nav-icon {
+      width: 32px; height: 32px;
+      background: var(--green);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+    }
 
-  .nav-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 18px;
-    letter-spacing: -0.3px;
-  }
+    .nav-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+    }
+    .nav-title span { color: var(--green); }
 
-  .nav-title span { color: var(--green); }
+    .nav-badge {
+      background: var(--green-dim);
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      border: 1px solid var(--green);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-  .nav-badge {
-    background: var(--green-dim);
-    color: var(--green);
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 20px;
-    border: 1px solid var(--green);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin-left: 8px;
-  }
+    .nav-actions { display: flex; gap: 10px; align-items: center; }
 
-  .nav-actions { display: flex; gap: 10px; align-items: center; }
+    .btn {
+      padding: 7px 18px;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
 
-  .btn {
-    padding: 7px 18px;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    font-size: 14px;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
-  }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
 
-  .btn-ghost {
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
-  }
-  .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+    .btn-primary {
+      background: var(--green);
+      color: #0d1117;
+      font-weight: 600;
+    }
+    .btn-primary:hover { background: #4fc762; transform: translateY(-1px); }
 
-  .btn-primary {
-    background: var(--green);
-    color: #0d1117;
-    font-weight: 600;
-  }
-  .btn-primary:hover { background: #4fc762; transform: translateY(-1px); }
+    /* ── LAYOUT ── */
+    .layout { display: flex; min-height: calc(100vh - 64px); }
 
-  /* ── LAYOUT ── */
-  .container {
-    max-width: 1300px;
-    margin: 0 auto;
-    padding: 2rem 1.5rem;
-  }
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 260px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 1.2rem;
+      flex-shrink: 0;
+    }
 
-  /* ── STAT PILLS ── */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
+    .sidebar h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
 
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.1rem 1.3rem;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transition: border-color 0.2s;
-  }
-  .stat-card:hover { border-color: var(--green); }
+    .stock-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      transition: border-color 0.2s;
+    }
+    .stock-item:hover { border-color: var(--green); }
 
-  .stat-icon {
-    width: 40px; height: 40px;
-    border-radius: 10px;
-    display: grid;
-    place-items: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
+    .stock-company {
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
 
-  .stat-label { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
-  .stat-value { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; }
-  .stat-delta { font-size: 11px; color: var(--green); margin-top: 2px; }
+    .stock-meta {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+    }
 
-  /* ── CARDS ── */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 1.4rem;
-  }
+    .stock-qty {
+      color: var(--green);
+      font-weight: 600;
+      font-size: 12px;
+    }
 
-  .card-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    margin-bottom: 1.2rem;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+    /* ── MAIN ── */
+    .main {
+      flex: 1;
+      padding: 2rem 1.5rem;
+      overflow-x: hidden;
+    }
 
-  .card-title::before {
-    content: '';
-    display: inline-block;
-    width: 3px; height: 14px;
-    background: var(--green);
-    border-radius: 2px;
-  }
+    /* ── STAT CARDS ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
 
-  /* ── CHARTS GRID ── */
-  .main-chart { margin-bottom: 1.5rem; }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.1rem 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: border-color 0.2s;
+      animation: fadeUp 0.4s ease both;
+    }
+    .stat-card:hover { border-color: var(--green); }
+    .stat-card:nth-child(1) { animation-delay: 0.05s; }
+    .stat-card:nth-child(2) { animation-delay: 0.10s; }
+    .stat-card:nth-child(3) { animation-delay: 0.15s; }
+    .stat-card:nth-child(4) { animation-delay: 0.20s; }
 
-  .charts-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.2rem;
-    margin-bottom: 1.5rem;
-  }
+    .stat-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
 
-  /* ── TABLE ── */
-  .table-wrap { overflow-x: auto; }
+    .stat-label { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+    .stat-value { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; }
+    .stat-delta { font-size: 11px; color: var(--green); margin-top: 2px; }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.4rem;
+      animation: fadeUp 0.4s ease both;
+    }
 
-  thead tr {
-    border-bottom: 1px solid var(--border);
-  }
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title::before {
+      content: '';
+      display: inline-block;
+      width: 3px; height: 14px;
+      background: var(--green);
+      border-radius: 2px;
+    }
 
-  thead th {
-    text-align: left;
-    padding: 10px 14px;
-    font-family: 'Syne', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
+    /* ── CHARTS GRID ── */
+    .main-chart { margin-bottom: 1.5rem; animation-delay: 0.25s; }
 
-  tbody tr {
-    border-bottom: 1px solid rgba(48,54,61,0.5);
-    transition: background 0.15s;
-  }
-  tbody tr:hover { background: var(--surface2); }
-  tbody tr:last-child { border-bottom: none; }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    .charts-grid .card:nth-child(1) { animation-delay: 0.30s; }
+    .charts-grid .card:nth-child(2) { animation-delay: 0.35s; }
+    .charts-grid .card:nth-child(3) { animation-delay: 0.40s; }
 
-  td { padding: 12px 14px; }
+    /* ── TABLE ── */
+    .table-card { animation-delay: 0.45s; }
+    .table-wrap { overflow-x: auto; }
 
-  .badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-  }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
 
-  .badge-plastic { background: rgba(248,81,73,0.15); color: #f85149; }
-  .badge-wood    { background: rgba(227,179,65,0.15); color: #e3b341; }
-  .badge-metal   { background: rgba(88,166,255,0.15); color: #58a6ff; }
-  .badge-paper   { background: rgba(63,185,80,0.15);  color: #3fb950; }
+    thead tr { border-bottom: 1px solid var(--border); }
 
-  .location-dot {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    color: var(--muted);
-  }
-  .location-dot::before {
-    content: '◉';
-    font-size: 9px;
-    color: var(--green);
-  }
+    thead th {
+      text-align: left;
+      padding: 10px 14px;
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
 
-  /* ── ANIMATIONS ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+    tbody tr {
+      border-bottom: 1px solid rgba(48,54,61,0.5);
+      transition: background 0.15s;
+    }
+    tbody tr:hover { background: var(--surface2); }
+    tbody tr:last-child { border-bottom: none; }
 
-  .stat-card  { animation: fadeUp 0.4s ease both; }
-  .stat-card:nth-child(1) { animation-delay: 0.05s; }
-  .stat-card:nth-child(2) { animation-delay: 0.10s; }
-  .stat-card:nth-child(3) { animation-delay: 0.15s; }
-  .stat-card:nth-child(4) { animation-delay: 0.20s; }
+    td { padding: 12px 14px; }
 
-  .main-chart { animation: fadeUp 0.4s 0.25s ease both; }
-  .charts-grid .card:nth-child(1) { animation: fadeUp 0.4s 0.30s ease both; }
-  .charts-grid .card:nth-child(2) { animation: fadeUp 0.4s 0.35s ease both; }
-  .charts-grid .card:nth-child(3) { animation: fadeUp 0.4s 0.40s ease both; }
-  .card.table-card { animation: fadeUp 0.4s 0.45s ease both; }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-plastic { background: rgba(248,81,73,0.15);  color: #f85149; }
+    .badge-wood    { background: rgba(227,179,65,0.15); color: #e3b341; }
+    .badge-metal   { background: rgba(88,166,255,0.15); color: #58a6ff; }
+    .badge-paper   { background: rgba(63,185,80,0.15);  color: #3fb950; }
 
-  @media (max-width: 900px) {
-    .stats-row { grid-template-columns: repeat(2, 1fr); }
-    .charts-grid { grid-template-columns: 1fr; }
-  }
-</style>
+    .location-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted);
+    }
+    .location-dot::before { content: '◉'; font-size: 9px; color: var(--green); }
+
+    /* ── ANIMATION ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) {
+      .stats-row    { grid-template-columns: repeat(2, 1fr); }
+      .charts-grid  { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      .sidebar      { display: none; }
+      .stats-row    { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
 </head>
 <body>
 
@@ -279,144 +313,162 @@
     <span class="nav-badge">Live</span>
   </div>
   <div class="nav-actions">
-    <button class="btn btn-ghost">Sign up</button>
-    <button class="btn btn-primary">Login</button>
+    <a href="{% url 'signup' %}"><button class="btn btn-ghost">Sign up</button></a>
+    <a href="{% url 'login' %}"><button class="btn btn-primary">Login</button></a>
   </div>
 </nav>
 
-<div class="container">
+<!-- LAYOUT -->
+<div class="layout">
 
-  <!-- STAT PILLS -->
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-icon" style="background:rgba(63,185,80,0.12)">🗂️</div>
-      <div>
-        <div class="stat-label">Total Waste Tracked</div>
-        <div class="stat-value">1,820 <span style="font-size:13px;color:var(--muted)">kg</span></div>
-        <div class="stat-delta">↑ 12% this month</div>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h3>Available Stock</h3>
+
+    {% for i in stock %}
+    <div class="stock-item">
+      <div class="stock-company">{{ i.company }}</div>
+      <div class="stock-meta">
+        <span>{{ i.waste_type }}</span>
+        <span class="stock-qty">{{ i.quantity }} kg</span>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon" style="background:rgba(88,166,255,0.12)">🏭</div>
-      <div>
-        <div class="stat-label">Active Companies</div>
-        <div class="stat-value">5</div>
-        <div class="stat-delta">↑ 2 new this week</div>
+    {% empty %}
+    <p style="color:var(--muted);font-size:13px;">No stock available</p>
+    {% endfor %}
+
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- STAT CARDS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(63,185,80,0.12)">🗂️</div>
+        <div>
+          <div class="stat-label">Total Waste Tracked</div>
+          <div class="stat-value">1,820 <span style="font-size:13px;color:var(--muted)">kg</span></div>
+          <div class="stat-delta">↑ 12% this month</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(88,166,255,0.12)">🏭</div>
+        <div>
+          <div class="stat-label">Active Companies</div>
+          <div class="stat-value">5</div>
+          <div class="stat-delta">↑ 2 new this week</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(227,179,65,0.12)">📋</div>
+        <div>
+          <div class="stat-label">Open Requirements</div>
+          <div class="stat-value">5</div>
+          <div class="stat-delta" style="color:var(--warn)">3 urgent</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(248,81,73,0.12)">♻️</div>
+        <div>
+          <div class="stat-label">Recycling Rate</div>
+          <div class="stat-value">68<span style="font-size:13px">%</span></div>
+          <div class="stat-delta">↑ 4% vs last month</div>
+        </div>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon" style="background:rgba(227,179,65,0.12)">📋</div>
-      <div>
-        <div class="stat-label">Open Requirements</div>
-        <div class="stat-value">5</div>
-        <div class="stat-delta" style="color:var(--warn)">3 urgent</div>
+
+    <!-- TOP HISTOGRAM -->
+    <div class="card main-chart">
+      <div class="card-title">Top 5 Waste Producing Companies</div>
+      <canvas id="topCompanies" height="80"></canvas>
+    </div>
+
+    <!-- 3 CHARTS -->
+    <div class="charts-grid">
+      <div class="card">
+        <div class="card-title">Available Waste Material</div>
+        <canvas id="availableWaste"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-title">Monthly Waste Trend</div>
+        <canvas id="monthlyTrend"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-title">Waste Distribution</div>
+        <canvas id="wasteType"></canvas>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon" style="background:rgba(248,81,73,0.12)">♻️</div>
-      <div>
-        <div class="stat-label">Recycling Rate</div>
-        <div class="stat-value">68<span style="font-size:13px">%</span></div>
-        <div class="stat-delta">↑ 4% vs last month</div>
+
+    <!-- TABLE -->
+    <div class="card table-card">
+      <div class="card-title">Consumer Requirements</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Waste Type</th>
+              <th>Quantity</th>
+              <th>Location</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Recycling Plant</strong></td>
+              <td><span class="badge badge-plastic">Plastic</span></td>
+              <td>200 kg</td>
+              <td><span class="location-dot">Delhi</span></td>
+              <td style="color:var(--muted)">12 Mar</td>
+            </tr>
+            <tr>
+              <td><strong>Furniture Maker</strong></td>
+              <td><span class="badge badge-wood">Wood</span></td>
+              <td>150 kg</td>
+              <td><span class="location-dot">Gurgaon</span></td>
+              <td style="color:var(--muted)">13 Mar</td>
+            </tr>
+            <tr>
+              <td><strong>Metal Factory</strong></td>
+              <td><span class="badge badge-metal">Metal</span></td>
+              <td>100 kg</td>
+              <td><span class="location-dot">Noida</span></td>
+              <td style="color:var(--muted)">13 Mar</td>
+            </tr>
+            <tr>
+              <td><strong>Paper Mill</strong></td>
+              <td><span class="badge badge-paper">Paper</span></td>
+              <td>300 kg</td>
+              <td><span class="location-dot">Delhi</span></td>
+              <td style="color:var(--muted)">14 Mar</td>
+            </tr>
+            <tr>
+              <td><strong>Plastic Industry</strong></td>
+              <td><span class="badge badge-plastic">Plastic</span></td>
+              <td>250 kg</td>
+              <td><span class="location-dot">Faridabad</span></td>
+              <td style="color:var(--muted)">15 Mar</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-  </div>
 
-  <!-- TOP HISTOGRAM -->
-  <div class="card main-chart">
-    <div class="card-title">Top 5 Waste Producing Companies</div>
-    <canvas id="topCompanies" height="80"></canvas>
-  </div>
-
-  <!-- 3 CHARTS -->
-  <div class="charts-grid">
-    <div class="card">
-      <div class="card-title">Available Waste Material</div>
-      <canvas id="availableWaste"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title">Monthly Waste Trend</div>
-      <canvas id="monthlyTrend"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title">Waste Distribution</div>
-      <canvas id="wasteType"></canvas>
-    </div>
-  </div>
-
-  <!-- TABLE -->
-  <div class="card table-card">
-    <div class="card-title" style="margin-bottom:1rem">Consumer Requirements</div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Company</th>
-            <th>Waste Type</th>
-            <th>Quantity</th>
-            <th>Location</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Recycling Plant</strong></td>
-            <td><span class="badge badge-plastic">Plastic</span></td>
-            <td>200 kg</td>
-            <td><span class="location-dot">Delhi</span></td>
-            <td style="color:var(--muted)">12 Mar</td>
-          </tr>
-          <tr>
-            <td><strong>Furniture Maker</strong></td>
-            <td><span class="badge badge-wood">Wood</span></td>
-            <td>150 kg</td>
-            <td><span class="location-dot">Gurgaon</span></td>
-            <td style="color:var(--muted)">13 Mar</td>
-          </tr>
-          <tr>
-            <td><strong>Metal Factory</strong></td>
-            <td><span class="badge badge-metal">Metal</span></td>
-            <td>100 kg</td>
-            <td><span class="location-dot">Noida</span></td>
-            <td style="color:var(--muted)">13 Mar</td>
-          </tr>
-          <tr>
-            <td><strong>Paper Mill</strong></td>
-            <td><span class="badge badge-paper">Paper</span></td>
-            <td>300 kg</td>
-            <td><span class="location-dot">Delhi</span></td>
-            <td style="color:var(--muted)">14 Mar</td>
-          </tr>
-          <tr>
-            <td><strong>Plastic Industry</strong></td>
-            <td><span class="badge badge-plastic">Plastic</span></td>
-            <td>250 kg</td>
-            <td><span class="location-dot">Faridabad</span></td>
-            <td style="color:var(--muted)">15 Mar</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-</div>
+  </div><!-- /main -->
+</div><!-- /layout -->
 
 <script>
-  const dark = {
-    color: '#e6edf3',
-    grid: 'rgba(48,54,61,0.6)',
-    tick: '#7d8590'
-  };
-
-  Chart.defaults.color = dark.tick;
+  Chart.defaults.color = '#7d8590';
   Chart.defaults.font.family = "'DM Sans', sans-serif";
 
+  const grid = { color: 'rgba(48,54,61,0.6)' };
   const commonScales = {
-    x: { grid: { color: dark.grid }, ticks: { color: dark.tick } },
-    y: { grid: { color: dark.grid }, ticks: { color: dark.tick } }
+    x: { grid, ticks: { color: '#7d8590' } },
+    y: { grid, ticks: { color: '#7d8590' } }
   };
 
-  // TOP HISTOGRAM
+  // TOP COMPANIES BAR
   new Chart(document.getElementById("topCompanies"), {
     type: "bar",
     data: {
@@ -441,7 +493,7 @@
     }
   });
 
-  // AVAILABLE WASTE
+  // PIE — AVAILABLE WASTE
   new Chart(document.getElementById("availableWaste"), {
     type: "pie",
     data: {
@@ -453,10 +505,12 @@
         borderWidth: 3
       }]
     },
-    options: { plugins: { legend: { position: 'bottom', labels: { padding: 16, boxWidth: 12 } } } }
+    options: {
+      plugins: { legend: { position: 'bottom', labels: { padding: 16, boxWidth: 12 } } }
+    }
   });
 
-  // MONTHLY TREND
+  // LINE — MONTHLY TREND
   new Chart(document.getElementById("monthlyTrend"), {
     type: "line",
     data: {
@@ -479,7 +533,7 @@
     }
   });
 
-  // WASTE TYPE
+  // DOUGHNUT — WASTE TYPE
   new Chart(document.getElementById("wasteType"), {
     type: "doughnut",
     data: {
@@ -498,5 +552,6 @@
     }
   });
 </script>
+
 </body>
 </html>

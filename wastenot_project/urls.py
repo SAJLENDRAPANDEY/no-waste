@@ -16,8 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from users.views import signup,login_view
+from wasteapp.views import producer_page,consumer_page
+
 
 urlpatterns = [
-path('admin/', admin.site.urls),
-path('',include('wasteapp.urls')),
+
+    path('', include('wasteapp.urls')),
+    path('', include('users.urls')),
+
 ]

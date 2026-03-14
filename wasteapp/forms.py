@@ -5,5 +5,11 @@ class WasteForm(forms.ModelForm):
 
     class Meta:
         model = Waste
-        fields = ['waste_type','quantity','source','status']
-        
+        fields = [
+            'company',
+            'waste_type',
+            'quantity',
+            'date',
+            'location',
+            'description'
+        ]
