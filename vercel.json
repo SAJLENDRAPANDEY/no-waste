@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "wastenot_project/wsgi.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "wastenot_project/wsgi.py"
+    }
+  ]
+}
