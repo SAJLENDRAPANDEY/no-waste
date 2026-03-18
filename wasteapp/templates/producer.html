@@ -1,183 +1,969 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Waste Data</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Producer Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-        body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f5f5f5;
-            font-family: sans-serif;
-        }
+<style>
+:root {
+  --bg:        #f0ede8;
+  --bg2:       #e8e4de;
+  --surface:   #ffffff;
+  --surface2:  #f7f5f2;
+  --border:    #dedad4;
+  --border2:   #ccc8c0;
+  --ink:       #1a1814;
+  --ink2:      #5a5650;
+  --ink3:      #9a9590;
+  --accent:    #2a6049;
+  --accent-lt: #d4ede5;
+  --accent-md: #4f9e84;
+  --amber:     #c47c2b;
+  --amber-lt:  #fdf0dc;
+  --red:       #b03a2e;
+  --red-lt:    #fcecea;
+  --blue:      #2c4f8a;
+  --blue-lt:   #dce6f5;
+  --purple:    #5c3d8a;
+  --purple-lt: #ede6f7;
+  --slate:     #3d4a5c;
+  --slate-lt:  #e4e8ef;
+}
 
-        .card {
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 2rem;
-            width: 100%;
-            max-width: 420px;
-        }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 1.75rem;
-        }
+html { scroll-behavior: smooth; }
 
-        .icon-box {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            background: #e8f5e9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  min-height: 100vh;
+}
 
-        .card-header h1 {
-            font-size: 20px;
-            font-weight: 500;
-            color: #111;
-            margin-bottom: 2px;
-        }
+/* ─── TEXTURE LAYER ─────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-size: 200px;
+  pointer-events: none;
+  z-index: 0;
+}
 
-        .card-header p {
-            font-size: 13px;
-            color: #777;
-        }
+/* ─── NAVBAR ────────────────────────────────── */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 48px;
+  height: 66px;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.04);
+}
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
 
-        .field label {
-            display: block;
-            font-size: 13px;
-            color: #555;
-            margin-bottom: 6px;
-        }
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-        .field input,
-        .field select {
-            width: 100%;
-            padding: 9px 12px;
-            font-size: 14px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background: #fafafa;
-            color: #111;
-            outline: none;
-            transition: border-color 0.2s;
-        }
+.brand-mark svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: white;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
 
-        .field input:focus,
-        .field select:focus {
-            border-color: #999;
-        }
+.brand-name {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+}
 
-        .btn-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 6px;
-        }
+.brand-sub {
+  font-size: 0.7rem;
+  color: var(--ink3);
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: -2px;
+}
 
-        .btn-clear {
-            flex: 1;
-            padding: 10px;
-            background: none;
-            color: #555;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-        .btn-clear:hover { background: #f5f5f5; }
+.nav-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 40px;
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
 
-        .btn-submit {
-            flex: 2;
-            padding: 10px;
-            background: #111;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
+.nav-pill:hover {
+  border-color: var(--accent);
+  background: var(--accent-lt);
+  color: var(--accent);
+}
 
-        .btn-submit:hover { opacity: 0.85; }
-    </style>
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-md) 100%);
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.btn-logout {
+  padding: 7px 16px;
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.2s;
+}
+
+.btn-logout:hover {
+  background: var(--red);
+  transform: translateY(-1px);
+}
+
+/* ─── MAIN LAYOUT ───────────────────────────── */
+.main {
+  position: relative;
+  z-index: 1;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 44px 32px 60px;
+}
+
+/* ─── PAGE HEADER ───────────────────────────── */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 36px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border2);
+}
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.page-title span {
+  display: block;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--ink3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.date-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  color: var(--ink2);
+  font-weight: 400;
+}
+
+.date-chip .dot-live {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: livePulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes livePulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.5; transform:scale(0.7); }
+}
+
+/* ─── KPI STRIP ─────────────────────────────── */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+  animation: riseIn 0.5s ease both;
+}
+
+.kpi:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+}
+
+.kpi:nth-child(1) { animation-delay: 0.05s; }
+.kpi:nth-child(2) { animation-delay: 0.10s; }
+.kpi:nth-child(3) { animation-delay: 0.15s; }
+.kpi:nth-child(4) { animation-delay: 0.20s; }
+
+@keyframes riseIn {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.kpi-accent {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 14px 0 0 14px;
+}
+
+.kpi.green  .kpi-accent { background: var(--accent); }
+.kpi.amber  .kpi-accent { background: var(--amber); }
+.kpi.red    .kpi-accent { background: var(--red); }
+.kpi.blue   .kpi-accent { background: var(--blue); }
+
+.kpi-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink3);
+}
+
+.kpi-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.kpi-sub {
+  font-size: 0.75rem;
+  color: var(--ink3);
+  font-weight: 300;
+}
+
+/* ─── SECTION LAYOUT (2-col on add) ────────── */
+.section-row {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+  align-items: start;
+}
+
+/* ─── CARD ──────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  animation: riseIn 0.5s ease both;
+}
+
+.card:nth-child(1) { animation-delay: 0.25s; }
+.card:nth-child(2) { animation-delay: 0.3s; }
+
+.card-full { margin-bottom: 20px; }
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.card-head-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.card-desc {
+  font-size: 0.75rem;
+  color: var(--ink3);
+  font-weight: 300;
+}
+
+.card-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--bg2);
+  color: var(--ink3);
+  border: 1px solid var(--border2);
+}
+
+.card-body { padding: 22px 24px; }
+
+/* ─── FORM ──────────────────────────────────── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.field:last-of-type { margin-bottom: 0; }
+
+.field label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--ink2);
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select {
+  width: 100%;
+  padding: 10px 13px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 9px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.88rem;
+  color: var(--ink);
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+input::placeholder { color: var(--ink3); }
+
+input:focus, select:focus {
+  outline: none;
+  background: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(42,96,73,0.1);
+}
+
+.select-wrap { position: relative; }
+
+.select-wrap::after {
+  content: '▾';
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink3);
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+.btn-add {
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px;
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.btn-add:hover {
+  background: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(42,96,73,0.25);
+}
+
+/* ─── TABLE ─────────────────────────────────── */
+.table-scroll { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead tr {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border2);
+}
+
+thead th {
+  padding: 11px 18px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--ink3);
+  text-align: left;
+  white-space: nowrap;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+tbody tr:last-child { border-bottom: none; }
+
+tbody tr:hover { background: var(--surface2); }
+
+tbody td {
+  padding: 13px 18px;
+  font-size: 0.875rem;
+  color: var(--ink);
+  vertical-align: middle;
+}
+
+/* ─── TYPE BADGES ───────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.badge-plastic  { background: var(--blue-lt);   color: var(--blue);   border: 1px solid #bfcfe8; }
+.badge-metal    { background: var(--slate-lt);  color: var(--slate);  border: 1px solid #c8cdd6; }
+.badge-organic  { background: var(--accent-lt); color: var(--accent); border: 1px solid #b8ddd4; }
+.badge-chemical { background: var(--amber-lt);  color: var(--amber);  border: 1px solid #e8c890; }
+.badge-electronic { background: var(--purple-lt); color: var(--purple); border: 1px solid #c8b8e8; }
+
+/* ─── STATUS CHIPS ──────────────────────────── */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.chip::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chip-pending  { background: var(--amber-lt); color: var(--amber); border: 1px solid #e8c890; }
+.chip-pending::before  { background: var(--amber); }
+.chip-approved { background: var(--accent-lt); color: var(--accent); border: 1px solid #b0d8cc; }
+.chip-approved::before { background: var(--accent); }
+.chip-rejected { background: var(--red-lt); color: var(--red); border: 1px solid #e0b8b4; }
+.chip-rejected::before { background: var(--red); }
+
+/* ─── ACTION BUTTONS ────────────────────────── */
+.actions { display: flex; gap: 6px; align-items: center; }
+
+.btn-sm {
+  padding: 5px 13px;
+  border-radius: 7px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  border: 1px solid transparent;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.btn-approve {
+  background: var(--accent-lt);
+  color: var(--accent);
+  border-color: #b0d8cc;
+}
+
+.btn-approve:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.btn-rej {
+  background: var(--red-lt);
+  color: var(--red);
+  border-color: #e0b8b4;
+}
+
+.btn-rej:hover {
+  background: var(--red);
+  color: white;
+  border-color: var(--red);
+  transform: translateY(-1px);
+}
+
+/* ─── EMPTY STATE ───────────────────────────── */
+.empty {
+  padding: 44px 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 2.4rem;
+  margin-bottom: 12px;
+  opacity: 0.35;
+}
+
+.empty-text {
+  font-size: 0.875rem;
+  color: var(--ink3);
+  font-weight: 300;
+}
+
+/* ─── FOOTER ────────────────────────────────── */
+.footer {
+  margin-top: 44px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-copy {
+  font-size: 0.78rem;
+  color: var(--ink3);
+  font-weight: 300;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  color: var(--ink);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+
+.btn-back:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-lt);
+  transform: translateX(-2px);
+}
+
+/* ─── QTY HIGHLIGHT ─────────────────────────── */
+.qty-val {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.qty-unit {
+  font-size: 0.72rem;
+  color: var(--ink3);
+  margin-left: 2px;
+}
+
+/* ─── RESPONSIVE ────────────────────────────── */
+@media (max-width: 900px) {
+  .kpi-strip { grid-template-columns: repeat(2,1fr); }
+  .section-row { grid-template-columns: 1fr; }
+  .navbar { padding: 0 20px; }
+  .main { padding: 28px 16px 48px; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+}
+</style>
 </head>
 <body>
 
-<div class="card">
+<!-- ─── NAVBAR ─────────────────────────────── -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24">
+        <path d="M3 7l9-4 9 4v10l-9 4-9-4V7z"/>
+        <path d="M12 3v18M3 7l9 4 9-4"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">Producer Portal</div>
+      <div class="brand-sub">Waste Management System</div>
+    </div>
+  </div>
 
-    <div class="card-header">
-        <div class="icon-box">♻️</div>
-        <div>
-            <h1>Add Waste Data</h1>
-            <p>Record new waste entry</p>
+  <div class="nav-right">
+    <a href="{% url 'profile' %}" class="nav-pill">
+      <div class="avatar">{{ request.user.username|slice:":1"|upper }}</div>
+      <span>{{ request.user.username }}</span>
+    </a>
+    <form method="POST" action="{% url 'logout' %}" style="display:inline;">
+      {% csrf_token %}
+      <button class="btn-logout" type="submit">Sign out</button>
+    </form>
+  </div>
+</nav>
+
+<!-- ─── MAIN ───────────────────────────────── -->
+<div class="main">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-title">
+      <span>Overview</span>
+      Waste Management
+    </div>
+    <div class="date-chip">
+      <div class="dot-live"></div>
+      <span id="liveDate">Loading…</span>
+    </div>
+  </div>
+
+  <!-- KPI STRIP -->
+  <div class="kpi-strip">
+    <div class="kpi green">
+      <div class="kpi-accent"></div>
+      <div class="kpi-label">Waste Entries</div>
+      <div class="kpi-value">{{ waste_list|length }}</div>
+      <div class="kpi-sub">Total records</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-accent"></div>
+      <div class="kpi-label">Requests</div>
+      <div class="kpi-value">{{ requests|length }}</div>
+      <div class="kpi-sub">All incoming</div>
+    </div>
+    <div class="kpi red">
+      <div class="kpi-accent"></div>
+      <div class="kpi-label">Pending</div>
+      <div class="kpi-value">
+       {{ pending_count }}
+      </div>
+      <div class="kpi-sub">Awaiting action</div>
+    </div>
+    <div class="kpi blue">
+      <div class="kpi-accent"></div>
+      <div class="kpi-label">Status</div>
+      <div class="kpi-value" style="font-size:1.1rem; font-family:'Outfit',sans-serif; color:var(--accent); margin-top:4px;">Active</div>
+      <div class="kpi-sub">System online</div>
+    </div>
+  </div>
+
+  <!-- ADD WASTE + STOCK (side-by-side) -->
+  <div class="section-row">
+
+    <!-- ADD WASTE FORM -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-title">Add Waste Entry</div>
+          <div class="card-desc">Log a new waste record</div>
         </div>
+        <div class="card-tag">New</div>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{% url 'add_waste' %}">
+          {% csrf_token %}
+          <div class="field">
+            <label>Company Name</label>
+            <input type="text" name="company" placeholder="e.g. GreenCore Ltd." required>
+          </div>
+          <div class="field">
+            <label>Waste Type</label>
+            <div class="select-wrap">
+              <select name="waste_type" required>
+                <option value="">Select category…</option>
+                <option value="plastic">Plastic</option>
+                <option value="metal">Metal</option>
+                <option value="organic">Organic</option>
+                <option value="chemical">Chemical</option>
+                <option value="electronic">Electronic</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Quantity (kg)</label>
+            <input type="number" name="quantity" placeholder="0" min="0" required>
+          </div>
+          <div class="field">
+            <label>Date</label>
+           <input type="date" name="date">
+           <div class="field">
+  <label>Location</label>
+  <input type="text" name="location" placeholder="e.g. Gurgaon" required>
+</div>
+          </div>
+          <button type="submit" class="btn-add">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Add Waste Entry
+          </button>
+        </form>
+      </div>
     </div>
 
-    <form method="POST">
-        {% csrf_token %}
-
-        <div class="form-group">
-
-            <div class="field">
-                <label for="company">Company Name</label>
-                <input type="text" id="company" name="company"
-                       placeholder="Enter company name">
-            </div>
-
-            <div class="field">
-                <label for="waste_type">Waste Type</label>
-                <select id="waste_type" name="waste_type">
-                    <option value="" disabled selected>Select waste type</option>
-                    <option value="plastic">Plastic</option>
-                    <option value="chemical">Chemical</option>
-                    <option value="electronic">Electronic</option>
-                    <option value="organic">Organic</option>
-                    <option value="metal">Metal</option>
-                    <option value="other">Other</option>
-                </select>
-            </div>
-
-            <div class="field">
-                <label for="quantity">Quantity (kg)</label>
-                <input type="number" id="quantity" name="quantity"
-                       placeholder="e.g. 250" min="0">
-            </div>
-
-            <div class="field">
-                <label for="date">Date</label>
-                <input type="date" id="date" name="date">
-            </div>
-
-            <div class="btn-row">
-                <button type="reset" class="btn-clear">Clear</button>
-                <button type="submit" class="btn-submit">Add Waste Entry</button>
-            </div>
-
+    <!-- WASTE STOCK TABLE -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-title">My Waste Stock</div>
+          <div class="card-desc">All logged inventory</div>
         </div>
-    </form>
+        <div class="card-tag">Inventory</div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Type</th>
+              <th>Quantity</th>
+              <th>Location</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for w in waste_list %}
+            <tr>
+              
+              <td style="font-weight:500;">{{ w.company }}</td>
+              <td><span class="badge badge-{{ w.waste_type }}">{{ w.waste_type|capfirst }}</span></td>
+              <td><span class="qty-val">{{ w.quantity }}</span><span class="qty-unit">kg</span></td>
+              <td>{{ w.location }}</td>
+              <td style="color:var(--ink3); font-size:0.83rem;">{{ w.date }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4">
+                <div class="empty">
+                  <div class="empty-icon">📦</div>
+                  <div class="empty-text">No waste entries yet.<br>Add one using the form.</div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div style="padding:15px; text-align:center;">
+  {% if waste_list.has_previous %}
+    <a href="?w_page={{ waste_list.previous_page_number }}" class="btn-sm">⬅ Prev</a>
+  {% endif %}
 
+  <span style="margin:0 10px;">
+    Page {{ waste_list.number }} of {{ waste_list.paginator.num_pages }}
+  </span>
+
+  {% if waste_list.has_next %}
+    <a href="?w_page={{ waste_list.next_page_number }}" class="btn-sm">Next ➡</a>
+  {% endif %}
 </div>
+    </div>
+
+  </div><!-- /section-row -->
+
+  <!-- REQUESTS TABLE -->
+  <div class="card card-full" style="animation-delay:0.35s;">
+    <div class="card-head">
+      <div class="card-head-left">
+        <div class="card-title">Incoming Waste Requests</div>
+        <div class="card-desc">Review and act on consumer requests</div>
+      </div>
+      <div class="card-tag">Requests</div>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Consumer</th>
+            <th>Waste Type</th>
+            <th>Quantity</th>
+            <th>Message</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in requests %}
+          <tr>
+            
+            <td>
+
+              <div style="display:flex;align-items:center;gap:9px;">
+                <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#2a6049,#4f9e84);display:flex;align-items:center;justify-content:center;color:white;font-size:0.7rem;font-weight:600;flex-shrink:0;">
+                  {{ r.consumer.username|slice:":1"|upper }}
+                </div>
+                <span style="font-weight:500;">{{ r.consumer.username }}</span>
+              </div>
+            </td>
+            <td><span class="badge badge-{{ r.waste.waste_type }}">{{ r.waste.waste_type|capfirst }}</span></td>
+            <td><span class="qty-val">{{ r.quantity }}</span><span class="qty-unit">kg</span></td>
+            <td style="color:var(--ink2); font-size:0.83rem; max-width:200px;">{{ r.message }}</td>
+            <td>
+              {% if r.status == "pending" %}
+                <span class="chip chip-pending">Pending</span>
+              {% elif r.status == "approved" %}
+                <span class="chip chip-approved">Approved</span>
+              {% else %}
+                <span class="chip chip-rejected">Rejected</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if r.status == "pending" %}
+              <div class="actions">
+                <a class="btn-sm btn-approve" href="{% url 'approve_request' r.id %}">✓ Approve</a>
+                <a class="btn-sm btn-rej" href="{% url 'reject_request' r.id %}">✕ Reject</a>
+              </div>
+              {% else %}
+              <span style="color:var(--ink3);font-size:0.82rem;">Resolved</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">
+              <div class="empty">
+                <div class="empty-icon">📬</div>
+                <div class="empty-text">No requests received yet.</div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    </div>
+    <div style="padding:15px; text-align:center;">
+  {% if requests.has_previous %}
+    <a href="?r_page={{ requests.previous_page_number }}" class="btn-sm">⬅ Prev</a>
+  {% endif %}
+
+  <span style="margin:0 10px;">
+    Page {{ requests.number }} of {{ requests.paginator.num_pages }}
+  </span>
+
+  {% if requests.has_next %}
+    <a href="?r_page={{ requests.next_page_number }}" class="btn-sm">Next ➡</a>
+  {% endif %}
+</div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-copy">© 2025 Waste Management System · All rights reserved</div>
+    <a href="{% url 'dashboard' %}" class="btn-back">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Dashboard
+    </a>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+  // Live date
+  const d = new Date();
+  document.getElementById('liveDate').textContent = d.toLocaleDateString('en-IN', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+</script>
 
 </body>
 </html>

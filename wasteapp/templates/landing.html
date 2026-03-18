@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Waste-Not — Waste Management Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:       #f5f2ec;
+  --bg2:      #ede9e1;
+  --surface:  #fafaf7;
+  --white:    #ffffff;
+  --border:   #ddd9d0;
+  --border2:  #ccc8be;
+  --ink:      #18160f;
+  --ink2:     #524e43;
+  --ink3:     #a09a8e;
+  --accent:   #2a6049;
+  --accent2:  #1e4735;
+  --accent-lt:#d6ede5;
+  --accent-md:#4f9e84;
+  --amber:    #b87420;
+  --amber-lt: #f5e8d0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Outfit',sans-serif;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+
+/* Noise texture */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-size:200px;
+  pointer-events:none;z-index:0;
+}
+
+/* ── NAVBAR ── */
+.navbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:66px;
+  background:rgba(245,242,236,0.92);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;
+}
+.nav-brand{display:flex;align-items:center;gap:13px;text-decoration:none;color:inherit}
+.brand-mark{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+}
+.brand-mark svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.brand-name{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:1.25rem;color:var(--ink);line-height:1}
+.brand-sub{font-size:.65rem;color:var(--ink3);font-weight:400;letter-spacing:.1em;text-transform:uppercase;margin-top:1px}
+.nav-right{display:flex;align-items:center;gap:10px}
+.btn-ghost{
+  padding:7px 18px;background:transparent;
+  border:1px solid var(--border);border-radius:8px;
+  font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:500;
+  color:var(--ink2);cursor:pointer;text-decoration:none;
+  transition:all .2s;
+}
+.btn-ghost:hover{border-color:var(--ink);color:var(--ink)}
+.btn-accent{
+  padding:7px 20px;background:var(--accent);border:none;border-radius:8px;
+  font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;
+  color:#fff;cursor:pointer;text-decoration:none;transition:all .2s;
+}
+.btn-accent:hover{background:var(--accent2);transform:translateY(-1px)}
+
+/* ── HERO ── */
+.hero{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+  gap:0;
+  padding:0 0 0 48px;
+  padding-top:66px;
+  overflow:hidden;
+}
+
+.hero-left{
+  padding:80px 60px 80px 0;
+  animation:riseIn .7s ease both;
+}
+@keyframes riseIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+.eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:1.5rem;
+}
+.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3rem,5vw,4.4rem);
+  font-weight:700;
+  line-height:1.05;
+  letter-spacing:-.02em;
+  margin-bottom:1.25rem;
+  color:var(--ink);
+}
+h1 em{font-style:italic;color:var(--accent)}
+
+.hero-desc{
+  font-size:1rem;color:var(--ink2);font-weight:300;
+  line-height:1.8;max-width:420px;margin-bottom:2.5rem;
+}
+
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.btn-primary{
+  padding:13px 34px;background:var(--accent);color:#fff;
+  border:none;border-radius:10px;
+  font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:600;
+  cursor:pointer;text-decoration:none;
+  transition:all .25s;display:inline-flex;align-items:center;gap:8px;
+}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 10px 28px rgba(42,96,73,.22)}
+.btn-secondary{
+  padding:13px 30px;background:transparent;color:var(--ink);
+  border:1.5px solid var(--border2);border-radius:10px;
+  font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:500;
+  cursor:pointer;text-decoration:none;transition:all .25s;display:inline-block;
+}
+.btn-secondary:hover{border-color:var(--ink);background:var(--white);transform:translateY(-2px)}
+
+.hero-trust{
+  display:flex;align-items:center;gap:12px;
+  margin-top:2rem;
+  font-size:.78rem;color:var(--ink3);font-weight:400;
+}
+.trust-avatars{display:flex}
+.trust-av{
+  width:28px;height:28px;border-radius:50%;
+  border:2px solid var(--bg);
+  background:var(--accent-lt);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.55rem;font-weight:600;color:var(--accent);
+  margin-left:-8px;
+}
+.trust-av:first-child{margin-left:0}
+
+/* Hero right - visual panel */
+.hero-right{
+  height:100vh;
+  background:var(--accent);
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.hero-right::before{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+  background-size:200px;
+}
+.hero-panel-content{
+  position:relative;z-index:1;
+  padding:48px;
+  width:100%;
+}
+.panel-label{
+  font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.5);margin-bottom:2rem;
+}
+.panel-stat-big{
+  font-family:'Cormorant Garamond',serif;
+  font-size:5rem;font-weight:700;
+  color:#fff;line-height:1;
+  margin-bottom:.25rem;
+}
+.panel-stat-label{font-size:.9rem;color:rgba(255,255,255,.6);font-weight:300;margin-bottom:3rem}
+
+.mini-cards{display:flex;flex-direction:column;gap:12px}
+.mini-card{
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;padding:16px 20px;
+  display:flex;align-items:center;gap:14px;
+  animation:slideRight .5s ease both;
+}
+.mini-card:nth-child(1){animation-delay:.2s}
+.mini-card:nth-child(2){animation-delay:.3s}
+.mini-card:nth-child(3){animation-delay:.4s}
+@keyframes slideRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.mc-icon{
+  width:36px;height:36px;border-radius:8px;
+  background:rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.mc-icon svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mc-info{flex:1}
+.mc-name{font-size:.82rem;font-weight:500;color:#fff;margin-bottom:2px}
+.mc-val{font-size:.72rem;color:rgba(255,255,255,.55);font-family:'DM Mono',monospace}
+.mc-badge{
+  font-size:.65rem;font-weight:500;
+  padding:3px 9px;border-radius:20px;
+  background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);
+}
+.mc-badge.green{background:rgba(90,220,130,.2);color:#7fffa4}
+
+/* ── FEATURES ── */
+.features{
+  position:relative;z-index:1;
+  padding:100px 48px;
+  background:var(--surface);
+}
+.section-head{text-align:center;margin-bottom:64px}
+.section-eyebrow{
+  font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.section-eyebrow::before,.section-eyebrow::after{content:'';width:24px;height:1px;background:var(--accent);opacity:.5}
+.section-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2rem,4vw,3rem);font-weight:700;
+  color:var(--ink);margin-bottom:14px;letter-spacing:-.01em;
+}
+.section-desc{font-size:.95rem;color:var(--ink2);font-weight:300;max-width:480px;margin:0 auto;line-height:1.8}
+
+.features-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:24px;max-width:1100px;margin:0 auto;
+}
+.feature-card{
+  background:var(--white);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:36px 28px;
+  position:relative;overflow:hidden;
+  transition:all .3s;
+}
+.feature-card::after{
+  content:'';
+  position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:var(--accent);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .35s ease;
+}
+.feature-card:hover{transform:translateY(-6px);box-shadow:0 20px 48px rgba(0,0,0,.08);border-color:var(--border2)}
+.feature-card:hover::after{transform:scaleX(1)}
+
+.feature-num{
+  font-family:'DM Mono',monospace;
+  font-size:.72rem;color:var(--ink3);
+  margin-bottom:20px;letter-spacing:.06em;
+}
+.feature-ico{
+  width:48px;height:48px;border-radius:12px;
+  background:var(--accent-lt);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:20px;
+}
+.feature-ico svg{width:22px;height:22px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.feature-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.4rem;font-weight:700;
+  color:var(--ink);margin-bottom:10px;
+}
+.feature-text{font-size:.9rem;color:var(--ink2);line-height:1.75;font-weight:300}
+
+/* ── STATS ── */
+.stats{
+  position:relative;z-index:1;
+  padding:80px 48px;
+  background:var(--ink);
+  overflow:hidden;
+}
+.stats::before{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  background-size:200px;pointer-events:none;
+}
+.stats-inner{
+  position:relative;z-index:1;
+  max-width:1100px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+}
+.stat-item{
+  text-align:center;
+  padding:0 32px;
+  border-right:1px solid rgba(255,255,255,.08);
+}
+.stat-item:last-child{border-right:none}
+.stat-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:3.2rem;font-weight:700;
+  color:var(--accent-md);line-height:1;margin-bottom:8px;
+}
+.stat-label{font-size:.82rem;color:rgba(255,255,255,.45);font-weight:400;letter-spacing:.04em}
+
+/* ── HOW IT WORKS ── */
+.how{
+  position:relative;z-index:1;
+  padding:100px 48px;
+  background:var(--bg2);
+}
+.how-grid{
+  max-width:1100px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:48px;
+}
+.how-step{position:relative}
+.how-step:not(:last-child)::after{
+  content:'→';
+  position:absolute;right:-28px;top:20px;
+  color:var(--border2);font-size:1.2rem;
+}
+.step-num{
+  font-family:'DM Mono',monospace;
+  font-size:2.5rem;font-weight:500;
+  color:var(--border2);line-height:1;
+  margin-bottom:16px;
+}
+.step-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.4rem;font-weight:700;color:var(--ink);
+  margin-bottom:10px;
+}
+.step-text{font-size:.9rem;color:var(--ink2);font-weight:300;line-height:1.75}
+
+/* ── CTA ── */
+.cta-section{
+  position:relative;z-index:1;
+  margin:60px 48px;
+  background:var(--accent);
+  border-radius:24px;
+  padding:80px 64px;
+  overflow:hidden;
+  display:grid;grid-template-columns:1fr auto;
+  align-items:center;gap:48px;
+}
+.cta-section::before{
+  content:'';position:absolute;right:-80px;top:-80px;
+  width:320px;height:320px;border-radius:50%;
+  background:rgba(255,255,255,.04);
+}
+.cta-section::after{
+  content:'';position:absolute;right:40px;bottom:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:rgba(255,255,255,.04);
+}
+.cta-left{position:relative;z-index:1}
+.cta-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1.8rem,3vw,2.6rem);font-weight:700;
+  color:#fff;line-height:1.15;margin-bottom:12px;
+}
+.cta-text{font-size:.95rem;color:rgba(255,255,255,.7);font-weight:300;line-height:1.7}
+.cta-right{position:relative;z-index:1;flex-shrink:0}
+.btn-cta{
+  padding:14px 38px;background:#fff;color:var(--accent);
+  border:none;border-radius:10px;
+  font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:600;
+  cursor:pointer;text-decoration:none;
+  transition:all .25s;display:inline-block;
+  white-space:nowrap;
+}
+.btn-cta:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.18)}
+
+/* ── FOOTER ── */
+.footer{
+  position:relative;z-index:1;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  padding:40px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.footer-brand{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.1rem;font-weight:700;color:var(--ink);
+}
+.footer-copy{font-size:.8rem;color:var(--ink3);font-weight:300}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:.82rem;color:var(--ink3);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--accent)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;padding:80px 24px 60px}
+  .hero-left{padding:60px 0 40px}
+  .hero-right{height:360px;border-radius:16px;margin:0 0 40px}
+  .features-grid,.how-grid,.stats-inner{grid-template-columns:1fr;gap:20px}
+  .stat-item{border-right:none;border-bottom:1px solid rgba(255,255,255,.08);padding:24px 0}
+  .stat-item:last-child{border-bottom:none}
+  .cta-section{grid-template-columns:1fr;gap:24px;margin:40px 24px;padding:48px 32px}
+  .navbar{padding:0 24px}
+  .features,.how,.stats{padding:60px 24px}
+  .footer{flex-direction:column;gap:16px;text-align:center;padding:32px 24px}
+  .how-step::after{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="/" class="nav-brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+    </div>
+    <div>
+      <div class="brand-name">Waste-Not</div>
+      <div class="brand-sub">Management System</div>
+    </div>
+  </a>
+  <div class="nav-right">
+    <a href="/login/" class="btn-ghost">Login</a>
+    <a href="/signup/" class="btn-accent">Sign Up Free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="eyebrow"><span class="eyebrow-dot"></span>Sustainable Waste Platform</div>
+    <h1>Transform <em>Waste</em><br>Into Value</h1>
+    <p class="hero-desc">Connect waste producers with certified recyclers. Track, manage, and convert waste efficiently — building a circular economy one ton at a time.</p>
+    <div class="hero-cta">
+      <a href="/signup/" class="btn-primary">
+        Get Started Free
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="/dashboard/" class="btn-secondary">View Dashboard</a>
+    </div>
+    <div class="hero-trust">
+      <div class="trust-avatars">
+        <div class="trust-av">AK</div>
+        <div class="trust-av">RS</div>
+        <div class="trust-av">MV</div>
+        <div class="trust-av">+</div>
+      </div>
+      Trusted by 10,000+ companies worldwide
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-panel-content">
+      <div class="panel-label">Live Dashboard</div>
+      <div class="panel-stat-big">95%</div>
+      <div class="panel-stat-label">Recycling efficiency this month</div>
+
+      <div class="mini-cards">
+        <div class="mini-card">
+          <div class="mc-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          </div>
+          <div class="mc-info">
+            <div class="mc-name">GreenLoop Recyclers</div>
+            <div class="mc-val">482 kg · Plastic PET</div>
+          </div>
+          <div class="mc-badge green">Matched</div>
+        </div>
+        <div class="mini-card">
+          <div class="mc-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M3 12h3m12 0h3M12 3v3m0 12v3"/></svg>
+          </div>
+          <div class="mc-info">
+            <div class="mc-name">EcoResolve Ltd.</div>
+            <div class="mc-val">1,200 kg · Ferrous Metal</div>
+          </div>
+          <div class="mc-badge">Pending</div>
+        </div>
+        <div class="mini-card">
+          <div class="mc-icon">
+            <svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+          </div>
+          <div class="mc-info">
+            <div class="mc-name">Monthly Savings</div>
+            <div class="mc-val">₹2.4L recovered value</div>
+          </div>
+          <div class="mc-badge green">+18%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="section-head">
+    <div class="section-eyebrow">Why Waste-Not</div>
+    <h2 class="section-title">Powerful Features</h2>
+    <p class="section-desc">Everything you need to manage waste efficiently and build a circular economy</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-num">01 —</div>
+      <div class="feature-ico">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+      </div>
+      <div class="feature-title">Track Waste</div>
+      <p class="feature-text">Monitor all waste streams from production to final recycling. Get detailed insights, audit trails, and compliance reports at every stage.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">02 —</div>
+      <div class="feature-ico">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="feature-title">Connect Parties</div>
+      <p class="feature-text">Link producers with certified recyclers and processors. AI-powered matching ensures the best fit for every waste type and volume.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">03 —</div>
+      <div class="feature-ico">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </div>
+      <div class="feature-title">Analytics</div>
+      <p class="feature-text">Real-time dashboards and comprehensive reports. Visualize recycling rates, cost savings, and environmental impact across your entire operation.</p>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-num">10K+</div>
+      <div class="stat-label">Registered Users</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">5K+</div>
+      <div class="stat-label">Companies</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">50K+</div>
+      <div class="stat-label">Tons Tracked</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">95%</div>
+      <div class="stat-label">Recycling Rate</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="section-head">
+    <div class="section-eyebrow">Process</div>
+    <h2 class="section-title">How It Works</h2>
+    <p class="section-desc">From waste to value in three simple steps</p>
+  </div>
+  <div class="how-grid">
+    <div class="how-step">
+      <div class="step-num">01</div>
+      <div class="step-title">List Your Waste</div>
+      <p class="step-text">Register your waste type, quantity, and location. Our system categorizes and validates your waste stream automatically.</p>
+    </div>
+    <div class="how-step">
+      <div class="step-num">02</div>
+      <div class="step-title">AI Matches You</div>
+      <p class="step-text">Our matching engine instantly connects you with the best-fit recyclers, rated by proximity, capacity, and certification.</p>
+    </div>
+    <div class="how-step">
+      <div class="step-num">03</div>
+      <div class="step-title">Track & Earn</div>
+      <p class="step-text">Monitor pickup, processing, and recycling in real time. Receive compliance certificates and recovered value reports.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-left">
+    <h2 class="cta-title">Ready to build a<br>circular economy?</h2>
+    <p class="cta-text">Join thousands of companies reducing waste, cutting costs, and building sustainability — all in one platform.</p>
+  </div>
+  <div class="cta-right">
+    <a href="/signup/" class="btn-cta">Create Your Account →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-brand">Waste-Not</div>
+  <div class="footer-copy">© 2026 Waste-Not. Building a sustainable future.</div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+
+</body>
+</html>

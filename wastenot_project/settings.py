@@ -1,16 +1,16 @@
 from pathlib import Path
 import os
-from dotenv import load_dotenv  # ✅ yeh add karo
+from dotenv import load_dotenv  
 
-load_dotenv()  # ✅ yeh add karo
+load_dotenv()  
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY')  # ✅ .env se lo
+SECRET_KEY = os.getenv('SECRET_KEY')  
 
 DEBUG = os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -72,16 +72,22 @@ TIME_ZONE     = 'UTC'
 USE_I18N      = True
 USE_TZ        = True
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
 
-# ✅ EMAIL SETTINGS
+
 EMAIL_BACKEND       = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST          = 'smtp.gmail.com'
 EMAIL_PORT          = 587
 EMAIL_USE_TLS       = True
 EMAIL_HOST_USER     = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+LOGOUT_REDIRECT_URL = 'login'
+
+LOGIN_REDIRECT_URL = 'dashboard'
+LOGIN_URL = 'login'

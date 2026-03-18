@@ -1,191 +1,823 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Available Waste – Consumer</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consumer Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    body {
-      background: #0d1117;
-      color: #e6edf3;
-      font-family: sans-serif;
-      min-height: 100vh;
-      padding: 2rem 1.5rem;
-    }
+<style>
+:root {
+  --bg:        #f0ede8;
+  --bg2:       #e8e4de;
+  --surface:   #ffffff;
+  --surface2:  #f7f5f2;
+  --border:    #dedad4;
+  --border2:   #ccc8c0;
+  --ink:       #1a1814;
+  --ink2:      #5a5650;
+  --ink3:      #9a9590;
+  --accent:    #2a6049;
+  --accent-lt: #d4ede5;
+  --accent-md: #4f9e84;
+  --amber:     #c47c2b;
+  --amber-lt:  #fdf0dc;
+  --red:       #b03a2e;
+  --red-lt:    #fcecea;
+  --blue:      #2c4f8a;
+  --blue-lt:   #dce6f5;
+  --purple:    #5c3d8a;
+  --purple-lt: #ede6f7;
+  --slate:     #3d4a5c;
+  --slate-lt:  #e4e8ef;
+  --success:   #2a6049;
+}
 
-    .table-card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 14px;
-      padding: 1.4rem;
-      max-width: 900px;
-      margin: 0 auto;
-    }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
 
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.2rem;
-    }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  min-height: 100vh;
+}
 
-    .card-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 15px;
-      font-weight: 700;
-      color: #e6edf3;
-    }
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-size: 200px;
+  pointer-events: none;
+  z-index: 0;
+}
 
-    .card-title::before {
-      content: '';
-      display: inline-block;
-      width: 3px; height: 16px;
-      background: #3fb950;
-      border-radius: 2px;
-    }
+/* ─── NAVBAR ─────────────────────────── */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 48px;
+  height: 66px;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.04);
+}
 
-    .count-badge {
-      background: rgba(63,185,80,0.12);
-      color: #3fb950;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 20px;
-      border: 1px solid rgba(63,185,80,0.3);
-    }
 
-    .table-wrap { overflow-x: auto; }
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-    thead tr { border-bottom: 1px solid #30363d; }
+.brand-mark svg {
+  width: 18px; height: 18px;
+  fill: none;
+  stroke: white;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 
-    thead th {
-      text-align: left;
-      padding: 10px 14px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      color: #7d8590;
-    }
+.brand-name {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+}
 
-    tbody tr {
-      border-bottom: 1px solid rgba(48,54,61,0.5);
-      transition: background 0.15s;
-    }
-    tbody tr:hover   { background: #1c2330; }
-    tbody tr:last-child { border-bottom: none; }
+.brand-sub {
+  font-size: 0.7rem;
+  color: var(--ink3);
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: -2px;
+}
 
-    td { padding: 13px 14px; }
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-    .company-name { font-weight: 500; color: #e6edf3; }
+.nav-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 40px;
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
 
-    .qty { color: #e6edf3; }
-    .qty span { color: #7d8590; font-size: 12px; }
+.nav-pill:hover {
+  border-color: var(--accent);
+  background: var(--accent-lt);
+  color: var(--accent);
+}
 
-    /* WASTE TYPE BADGES */
-    .badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-    }
+.avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-md) 100%);
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-    .badge-plastic  { background: rgba(248,81,73,0.15);  color: #f85149; }
-    .badge-paper    { background: rgba(63,185,80,0.15);   color: #3fb950; }
-    .badge-metal    { background: rgba(88,166,255,0.15);  color: #58a6ff; }
-    .badge-organic  { background: rgba(63,185,80,0.15);   color: #3fb950; }
-    .badge-chemical { background: rgba(227,179,65,0.15);  color: #e3b341; }
-    .badge-wood     { background: rgba(227,179,65,0.15);  color: #e3b341; }
-    .badge-other    { background: rgba(125,133,144,0.15); color: #7d8590; }
+.btn-logout {
+  padding: 7px 16px;
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.2s;
+}
 
-    /* REQUEST BUTTON */
-    .btn-request {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: rgba(63,185,80,0.12);
-      color: #3fb950;
-      border: 1px solid rgba(63,185,80,0.3);
-      padding: 5px 14px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-    .btn-request:hover { background: rgba(63,185,80,0.22); }
+.btn-logout:hover {
+  background: var(--red);
+  transform: translateY(-1px);
+}
 
-    /* EMPTY STATE */
-    .empty-state {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: #7d8590;
-      font-size: 14px;
-    }
-    .empty-state .icon { font-size: 32px; margin-bottom: 8px; }
-  </style>
+/* ─── MAIN ───────────────────────────── */
+.main {
+  position: relative;
+  z-index: 1;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 44px 32px 60px;
+}
+
+/* ─── PAGE HEADER ────────────────────── */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border2);
+  animation: riseIn 0.4s ease both;
+}
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.page-title span {
+  display: block;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--ink3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.date-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  color: var(--ink2);
+}
+
+.dot-live {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.4; transform:scale(0.7); }
+}
+
+@keyframes riseIn {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ─── TOAST ──────────────────────────── */
+.toast-wrap {
+  margin-bottom: 24px;
+  animation: riseIn 0.4s ease both;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--accent-lt);
+  border: 1px solid #b0d8cc;
+  color: var(--accent);
+  padding: 13px 18px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.toast-icon {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+/* ─── TOOLBAR ────────────────────────── */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  animation: riseIn 0.45s ease both;
+  animation-delay: 0.05s;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  overflow: hidden;
+  flex: 1;
+  max-width: 460px;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.search-form:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(42,96,73,0.1);
+}
+
+.search-icon {
+  padding: 0 13px;
+  color: var(--ink3);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  padding: 11px 0;
+  background: transparent;
+  border: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.875rem;
+  color: var(--ink);
+  outline: none;
+}
+
+.search-input::placeholder { color: var(--ink3); }
+
+.btn-search {
+  padding: 10px 18px;
+  background: var(--ink);
+  color: white;
+  border: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-search:hover { background: var(--accent); }
+
+.btn-requirement {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-requirement:hover {
+  background: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(42,96,73,0.25);
+}
+
+/* ─── CARD ───────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  animation: riseIn 0.5s ease both;
+  animation-delay: 0.1s;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.result-count {
+  font-size: 0.75rem;
+  color: var(--ink3);
+  font-weight: 400;
+}
+
+.card-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--bg2);
+  color: var(--ink3);
+  border: 1px solid var(--border2);
+}
+
+/* ─── TABLE ──────────────────────────── */
+.table-scroll { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead tr {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border2);
+}
+
+thead th {
+  padding: 11px 20px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--ink3);
+  text-align: left;
+  white-space: nowrap;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface2); }
+
+tbody td {
+  padding: 14px 20px;
+  font-size: 0.875rem;
+  color: var(--ink);
+  vertical-align: middle;
+}
+
+/* ─── WASTE TYPE BADGES ──────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.badge-plastic   { background: var(--blue-lt);   color: var(--blue);   border: 1px solid #bfcfe8; }
+.badge-metal     { background: var(--slate-lt);  color: var(--slate);  border: 1px solid #c8cdd6; }
+.badge-organic   { background: var(--accent-lt); color: var(--accent); border: 1px solid #b8ddd4; }
+.badge-chemical  { background: var(--amber-lt);  color: var(--amber);  border: 1px solid #e8c890; }
+.badge-electronic{ background: var(--purple-lt); color: var(--purple); border: 1px solid #c8b8e8; }
+.badge-paper     { background: var(--accent-lt); color: var(--accent); border: 1px solid #b8ddd4; }
+
+/* ─── QTY ────────────────────────────── */
+.qty-val {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ink);
+}
+.qty-unit { font-size: 0.72rem; color: var(--ink3); margin-left: 2px; }
+
+/* ─── REQUEST BUTTON ─────────────────── */
+.btn-request {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--accent-lt);
+  color: var(--accent);
+  border: 1px solid #b0d8cc;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.btn-request:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(42,96,73,0.2);
+}
+
+/* ─── EMPTY STATE ────────────────────── */
+.empty {
+  padding: 50px 20px;
+  text-align: center;
+}
+.empty-icon { font-size: 2.4rem; opacity: 0.3; margin-bottom: 12px; }
+.empty-text { font-size: 0.875rem; color: var(--ink3); font-weight: 300; }
+
+/* ─── PAGINATION ─────────────────────── */
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.page-info {
+  font-size: 0.8rem;
+  color: var(--ink3);
+  font-weight: 400;
+}
+
+.page-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 7px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--ink2);
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.page-btn:hover {
+  background: var(--surface);
+  border-color: var(--border2);
+  color: var(--ink);
+}
+
+.page-btn.active {
+  background: var(--ink);
+  color: white;
+  border-color: var(--ink);
+}
+
+.page-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--border2);
+  margin: 0 4px;
+}
+
+/* ─── FOOTER ─────────────────────────── */
+.footer {
+  margin-top: 44px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-copy {
+  font-size: 0.78rem;
+  color: var(--ink3);
+  font-weight: 300;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  color: var(--ink);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-back:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-lt);
+}
+
+/* ─── RESPONSIVE ─────────────────────── */
+@media (max-width: 768px) {
+  .navbar { padding: 0 18px; }
+  .main { padding: 24px 14px 48px; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .search-form { max-width: 100%; }
+  .btn-requirement { justify-content: center; }
+  .pagination-bar { flex-direction: column; gap: 10px; align-items: center; }
+}
+</style>
 </head>
 <body>
 
-<div class="table-card">
-
-  <div class="card-header">
-    <div class="card-title">Available Waste Stock</div>
-    <span class="count-badge">{{ data|length }} Available</span>
+<!-- ─── NAVBAR ──────────────────────────── -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24">
+        <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+        <path d="M10 11v6M14 11v6"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">Waste-Not</div>
+      <div class="brand-sub">Consumer Portal</div>
+    </div>
   </div>
 
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Company</th>
-          <th>Waste Type</th>
-          <th>Quantity</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
 
-        {% for i in data %}
-        <tr>
-          <td class="company-name">{{ i.company }}</td>
-          <td>
-            <span class="badge badge-{{ i.waste_type|lower }}">
-              {{ i.waste_type }}
-            </span>
-          </td>
-          <td class="qty">{{ i.quantity }} <span>kg</span></td>
-          <td>
-            <a href="/request/{{ i.id }}/" class="btn-request">Request</a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="4">
-            <div class="empty-state">
-              <div class="icon">📦</div>
-              No waste stock available right now
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
+  <div class="nav-right">
+    <a href="/smart-match/" class="nav-pill">
+    🤖 AI Match
+  </a>
+    <a href="{% url 'profile' %}" class="nav-pill">
+      <div class="avatar">{{ request.user.username|slice:":1"|upper }}</div>
+      <span>{{ request.user.username }}</span>
+    </a>
+    <form method="POST" action="{% url 'logout' %}" style="display:inline;">
+      {% csrf_token %}
+      <button class="btn-logout" type="submit">Sign out</button>
+    </form>
+  </div>
+</nav>
 
-      </tbody>
-    </table>
+<!-- ─── MAIN ──────────────────────────────── -->
+<div class="main">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-title">
+      <span>Marketplace</span>
+      Available Waste Materials
+    </div>
+    <div class="date-chip">
+      <div class="dot-live"></div>
+      <span id="liveDate">Loading…</span>
+    </div>
+  </div>
+
+  <!-- TOAST MESSAGES -->
+  {% if messages %}
+  <div class="toast-wrap">
+    {% for message in messages %}
+    <div class="toast">
+      <div class="toast-icon">✓</div>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <form method="GET" class="search-form">
+      <div class="search-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      </div>
+      <input
+        class="search-input"
+        type="text"
+        name="search"
+        placeholder="Search by company or waste type…"
+        value="{{ search_query }}"
+      >
+      <button type="submit" class="btn-search">Search</button>
+    </form>
+
+    <a href="{% url 'add_requirement' %}" class="btn-requirement">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Add Requirement
+    </a>
+  </div>
+
+  <!-- TABLE CARD -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">Waste Listings</div>
+      <div class="card-meta">
+        {% if search_query %}
+        <span class="result-count">Results for "{{ search_query }}"</span>
+        {% endif %}
+        <div class="card-tag">Live</div>
+      </div>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Company</th>
+            <th>Waste Type</th>
+            <th>Quantity</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in data %}
+          <tr>
+            <td style="color:var(--ink3); font-size:0.8rem;">{{ forloop.counter }}</td>
+            <td style="font-weight:500;">{{ i.company }}</td>
+            <td>
+              <span class="badge badge-{{ i.waste_type|lower }}">{{ i.waste_type }}</span>
+            </td>
+            <td>
+              <span class="qty-val">{{ i.quantity }}</span><span class="qty-unit">kg</span>
+            </td>
+            <td style="color:var(--ink3); font-size:0.83rem;">{{ i.date }}</td>
+            <td>
+              <a href="{% url 'request' i.id %}" class="btn-request">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                Request
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">
+              <div class="empty">
+                <div class="empty-icon">🔍</div>
+                <div class="empty-text">
+                  {% if search_query %}
+                    No results found for "{{ search_query }}".<br>Try a different search term.
+                  {% else %}
+                    No waste materials available at the moment.
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAGINATION -->
+    {% if data.has_previous or data.has_next %}
+    <div class="pagination-bar">
+      <div class="page-info">
+        Page {{ data.number }} of {{ data.paginator.num_pages }}
+      </div>
+      <div class="page-links">
+        {% if data.has_previous %}
+          <a class="page-btn" href="?page=1&search={{ search_query }}">« First</a>
+          <a class="page-btn" href="?page={{ data.previous_page_number }}&search={{ search_query }}">‹ Prev</a>
+          <div class="page-sep"></div>
+        {% endif %}
+        <span class="page-btn active">{{ data.number }}</span>
+        {% if data.has_next %}
+          <div class="page-sep"></div>
+          <a class="page-btn" href="?page={{ data.next_page_number }}&search={{ search_query }}">Next ›</a>
+          <a class="page-btn" href="?page={{ data.paginator.num_pages }}&search={{ search_query }}">Last »</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div><!-- /card -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-copy">© 2025 Waste-Not · Consumer Portal</div>
+    <a href="{% url 'dashboard' %}" class="btn-back">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Dashboard
+    </a>
   </div>
 
 </div>
+
+<script>
+  const d = new Date();
+  document.getElementById('liveDate').textContent = d.toLocaleDateString('en-IN', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+</script>
 
 </body>
 </html>

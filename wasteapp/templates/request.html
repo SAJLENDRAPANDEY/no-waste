@@ -1,235 +1,741 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Request Waste</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Request Waste — Waste-Not</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    body {
-      background: #0d1117;
-      color: #e6edf3;
-      font-family: sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1.5rem;
-    }
+<style>
+:root {
+  --bg:        #f0ede8;
+  --bg2:       #e8e4de;
+  --surface:   #ffffff;
+  --surface2:  #f7f5f2;
+  --border:    #dedad4;
+  --border2:   #ccc8c0;
+  --ink:       #1a1814;
+  --ink2:      #5a5650;
+  --ink3:      #9a9590;
+  --accent:    #2a6049;
+  --accent-lt: #d4ede5;
+  --accent-md: #4f9e84;
+  --amber:     #c47c2b;
+  --amber-lt:  #fdf0dc;
+  --red:       #b03a2e;
+  --red-lt:    #fcecea;
+  --blue:      #2c4f8a;
+  --blue-lt:   #dce6f5;
+  --purple:    #5c3d8a;
+  --purple-lt: #ede6f7;
+  --slate:     #3d4a5c;
+  --slate-lt:  #e4e8ef;
+}
 
-    .card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 16px;
-      padding: 2rem;
-      width: 100%;
-      max-width: 460px;
-    }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
 
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 1.75rem;
-    }
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  font-family: 'Outfit', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+  position: relative;
+}
 
-    .header-icon {
-      width: 38px; height: 38px;
-      background: rgba(63,185,80,0.12);
-      border-radius: 10px;
-      display: grid;
-      place-items: center;
-      font-size: 18px;
-    }
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  background-size: 200px;
+  pointer-events: none;
+  z-index: 0;
+}
 
-    .card-header h1 { font-size: 20px; font-weight: 700; color: #e6edf3; margin-bottom: 2px; }
-    .card-header p  { font-size: 13px; color: #7d8590; }
+/* BG BLOBS */
+body::after {
+  content: '';
+  position: fixed;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(42,96,73,0.07) 0%, transparent 70%);
+  top: -100px; right: -100px;
+  pointer-events: none;
+  z-index: 0;
+}
 
-    .waste-info {
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      padding: 12px 14px;
-      margin-bottom: 1.4rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+.blob2 {
+  position: fixed;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(44,79,138,0.05) 0%, transparent 70%);
+  bottom: -100px; left: -100px;
+  pointer-events: none;
+  z-index: 0;
+}
 
-    .info-item label {
-      font-size: 11px;
-      color: #7d8590;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      display: block;
-      margin-bottom: 3px;
-    }
+/* ── CARD ───────────────────────── */
+.card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 500px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(26,24,20,0.08), 0 1px 0 rgba(26,24,20,0.04);
+  animation: riseIn 0.5s ease both;
+}
 
-    .info-item span { font-size: 14px; font-weight: 500; color: #e6edf3; }
+@keyframes riseIn {
+  from { opacity:0; transform:translateY(22px); }
+  to   { opacity:1; transform:translateY(0); }
+}
 
-    .badge {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-    .badge-plastic  { background: rgba(248,81,73,0.15);  color: #f85149; }
-    .badge-paper    { background: rgba(63,185,80,0.15);   color: #3fb950; }
-    .badge-metal    { background: rgba(88,166,255,0.15);  color: #58a6ff; }
-    .badge-organic  { background: rgba(63,185,80,0.15);   color: #3fb950; }
-    .badge-chemical { background: rgba(227,179,65,0.15);  color: #e3b341; }
-    .badge-wood     { background: rgba(227,179,65,0.15);  color: #e3b341; }
-    .badge-other    { background: rgba(125,133,144,0.15); color: #7d8590; }
+/* CARD TOP BAR */
+.card-topbar {
+  background: var(--ink);
+  padding: 22px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-    .form-group { display: flex; flex-direction: column; gap: 14px; }
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-    .field label {
-      display: block;
-      font-size: 12px;
-      color: #7d8590;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 6px;
-    }
+.topbar-icon {
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-    .field input,
-    .field textarea {
-      width: 100%;
-      padding: 10px 12px;
-      font-size: 14px;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      background: #0d1117;
-      color: #e6edf3;
-      outline: none;
-      transition: border-color 0.2s;
-      font-family: sans-serif;
-    }
+.topbar-icon svg {
+  width: 17px; height: 17px;
+  stroke: white;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 
-    .field input:focus,
-    .field textarea:focus { border-color: #3fb950; }
+.topbar-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+}
 
-    .field textarea { resize: vertical; min-height: 90px; }
+.topbar-sub {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.38);
+  font-weight: 300;
+  margin-top: -2px;
+}
 
-    .btn-row { display: flex; gap: 10px; margin-top: 6px; }
+.topbar-step {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.35);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
 
-    .btn-cancel {
-      flex: 1;
-      padding: 10px;
-      background: none;
-      color: #7d8590;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      font-size: 14px;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .btn-cancel:hover { color: #e6edf3; border-color: #7d8590; }
+/* CARD BODY */
+.card-body {
+  padding: 28px;
+}
 
-    .btn-submit {
-      flex: 2;
-      padding: 10px;
-      background: #3fb950;
-      color: #0d1117;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-    .btn-submit:hover { opacity: 0.85; }
-  </style>
+/* ALERTS */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 12px 16px;
+  border-radius: 11px;
+  margin-bottom: 22px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.alert svg {
+  width: 17px; height: 17px;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.alert-success {
+  background: var(--accent-lt);
+  border: 1px solid #b0d8cc;
+  color: var(--accent);
+}
+
+.alert-success svg { stroke: var(--accent); }
+
+.alert-error {
+  background: var(--red-lt);
+  border: 1px solid #e0b8b4;
+  color: var(--red);
+}
+
+.alert-error svg { stroke: var(--red); }
+
+/* WASTE INFO PANEL */
+.waste-panel {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 26px;
+}
+
+.waste-panel-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink3);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.waste-panel-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.waste-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.waste-item {}
+
+.waste-item .wi-label {
+  font-size: 0.68rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink3);
+  margin-bottom: 4px;
+}
+
+.waste-item .wi-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.avail-bar {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.avail-bar-label {
+  font-size: 0.72rem;
+  color: var(--ink3);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.avail-bar-track {
+  flex: 1;
+  height: 5px;
+  background: var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.avail-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-md));
+  border-radius: 10px;
+  width: 100%;
+}
+
+.avail-qty {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+/* BADGES */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.badge-plastic   { background: var(--blue-lt);   color: var(--blue);   border: 1px solid #bfcfe8; }
+.badge-metal     { background: var(--slate-lt);  color: var(--slate);  border: 1px solid #c8cdd6; }
+.badge-organic   { background: var(--accent-lt); color: var(--accent); border: 1px solid #b8ddd4; }
+.badge-chemical  { background: var(--amber-lt);  color: var(--amber);  border: 1px solid #e8c890; }
+.badge-electronic{ background: var(--purple-lt); color: var(--purple); border: 1px solid #c8b8e8; }
+.badge-paper     { background: var(--accent-lt); color: var(--accent); border: 1px solid #b8ddd4; }
+.badge-wood      { background: var(--amber-lt);  color: var(--amber);  border: 1px solid #e8c890; }
+.badge-other     { background: var(--slate-lt);  color: var(--slate);  border: 1px solid #c8cdd6; }
+
+/* FORM */
+.section-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink3);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--ink2);
+  margin-bottom: 7px;
+}
+
+.input-wrap { position: relative; }
+
+.input-icon {
+  position: absolute;
+  left: 13px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink3);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon svg {
+  width: 15px; height: 15px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.textarea-icon {
+  position: absolute;
+  left: 13px;
+  top: 13px;
+  color: var(--ink3);
+  pointer-events: none;
+  display: flex;
+}
+
+.textarea-icon svg {
+  width: 15px; height: 15px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="number"] {
+  width: 100%;
+  padding: 11px 14px 11px 40px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.88rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+textarea {
+  width: 100%;
+  padding: 11px 14px 11px 40px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.88rem;
+  color: var(--ink);
+  outline: none;
+  resize: vertical;
+  min-height: 96px;
+  line-height: 1.6;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+input::placeholder, textarea::placeholder { color: var(--ink3); }
+
+input:focus, textarea:focus {
+  background: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(42,96,73,0.1);
+}
+
+.hint {
+  font-size: 0.72rem;
+  color: var(--ink3);
+  font-weight: 300;
+  margin-top: 5px;
+  padding-left: 2px;
+}
+
+/* BUTTON ROW */
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 12px;
+  background: var(--surface2);
+  color: var(--ink2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  background: var(--bg2);
+  border-color: var(--border2);
+  color: var(--ink);
+}
+
+.btn-cancel svg {
+  width: 14px; height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.btn-submit {
+  flex: 2;
+  padding: 12px;
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.22s;
+  box-shadow: 0 4px 14px rgba(26,24,20,0.15);
+}
+
+.btn-submit:hover {
+  background: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(42,96,73,0.25);
+}
+
+.btn-submit:active { transform: translateY(0); }
+
+.btn-submit svg {
+  width: 15px; height: 15px;
+  stroke: white;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s;
+}
+
+.btn-submit:hover svg { transform: translateX(3px); }
+
+/* SUCCESS STATE */
+.success-state {
+  text-align: center;
+  padding: 12px 0 8px;
+}
+
+.success-icon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--accent-lt);
+  border: 1px solid #b0d8cc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+}
+
+.success-icon svg {
+  width: 28px; height: 28px;
+  stroke: var(--accent);
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.success-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.success-desc {
+  font-size: 0.875rem;
+  color: var(--ink3);
+  font-weight: 300;
+  line-height: 1.7;
+  max-width: 300px;
+  margin: 0 auto 24px;
+}
+
+.btn-back-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 24px;
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(26,24,20,0.15);
+}
+
+.btn-back-home:hover {
+  background: var(--accent);
+  transform: translateY(-1px);
+}
+
+.btn-back-home svg {
+  width: 14px; height: 14px;
+  stroke: white;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+</style>
 </head>
 <body>
 
+<div class="blob2"></div>
+
 <div class="card">
 
-  <div class="card-header">
-    <div class="header-icon">📨</div>
-    <div>
-      <h1>Request Waste</h1>
-      <p>Fill details — company will respond on your email</p>
+  <!-- TOP BAR -->
+  <div class="card-topbar">
+    <div class="topbar-brand">
+      <div class="topbar-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="topbar-title">Request Waste</div>
+        <div class="topbar-sub">Submit your material request</div>
+      </div>
     </div>
+    <div class="topbar-step">Waste-Not Portal</div>
   </div>
 
-  {% if sent %}
-  <div style="background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.3);border-radius:8px;padding:12px 14px;margin-bottom:1rem;font-size:13px;color:#3fb950;">
-    ✅ Request sent! Check your email for confirmation from <strong>{{ waste.company }}</strong>.
-  </div>
-  {% endif %}
+  <div class="card-body">
 
-  {% if error %}
-  <div style="background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.3);border-radius:8px;padding:10px 14px;margin-bottom:1rem;font-size:13px;color:#f85149;">
-    ⚠️ {{ error }}
-  </div>
-  {% endif %}
+    <!-- SUCCESS ALERT -->
+    {% if sent %}
+    <div class="alert alert-success">
+      <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+      <div>Request sent successfully! <strong>{{ waste.company }}</strong> will reach out via email to confirm your request.</div>
+    </div>
+    {% endif %}
 
-  <!-- WASTE DETAILS -->
-  <div class="waste-info">
-    <div class="info-item">
-      <label>Company</label>
-      <span>{{ waste.company }}</span>
+    <!-- ERROR ALERT -->
+    {% if error %}
+    <div class="alert alert-error">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>{{ error }}</div>
     </div>
-    <div class="info-item">
-      <label>Waste Type</label>
-      <span class="badge badge-{{ waste.waste_type|lower }}">{{ waste.waste_type }}</span>
-    </div>
-    <div class="info-item">
-      <label>Available</label>
-      <span>{{ waste.quantity }} kg</span>
-    </div>
-    <div class="info-item">
-      <label>Date</label>
-      <span>{{ waste.date }}</span>
-    </div>
-  </div>
+    {% endif %}
 
-  {% if not sent %}
-  <form method="POST">
-    {% csrf_token %}
-    <div class="form-group">
+    <!-- WASTE INFO PANEL -->
+    <div class="waste-panel">
+      <div class="waste-panel-label">Waste Details</div>
+      <div class="waste-grid">
+        <div class="waste-item">
+          <div class="wi-label">Company</div>
+          <div class="wi-value">{{ waste.company }}</div>
+        </div>
+        <div class="waste-item">
+          <div class="wi-label">Waste Type</div>
+          <div class="wi-value">
+            <span class="badge badge-{{ waste.waste_type|lower }}">{{ waste.waste_type }}</span>
+          </div>
+        </div>
+        <div class="waste-item">
+          <div class="wi-label">Listed Date</div>
+          <div class="wi-value">{{ waste.date }}</div>
+        </div>
+        <div class="waste-item">
+          <div class="wi-label">Available</div>
+          <div class="wi-value" style="color:var(--accent);">{{ waste.quantity }} kg</div>
+        </div>
+      </div>
+      <div class="avail-bar">
+        <span class="avail-bar-label">Stock</span>
+        <div class="avail-bar-track">
+          <div class="avail-bar-fill"></div>
+        </div>
+        <span class="avail-qty">{{ waste.quantity }} kg</span>
+      </div>
+    </div>
+
+    <!-- FORM OR SUCCESS STATE -->
+    {% if sent %}
+    <div class="success-state">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="success-title">Request Submitted!</div>
+      <div class="success-desc">
+        Your request to <strong>{{ waste.company }}</strong> has been sent. They will contact you on your email to confirm the details.
+      </div>
+      <a href="/consumer/" class="btn-back-home">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Marketplace
+      </a>
+    </div>
+
+    {% else %}
+
+    <div class="section-label">Your Details</div>
+
+    <form method="POST">
+      {% csrf_token %}
 
       <div class="field">
-        <label>Your Name</label>
-        <input type="text" name="consumer_name"
-               placeholder="Enter your full name">
+        <label>Full Name</label>
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          </div>
+          <input type="text" name="consumer_name" placeholder="Enter your full name">
+        </div>
       </div>
 
       <div class="field">
-        <label>Your Email</label>
-        <input type="email" name="consumer_email"
-               placeholder="Enter your email address">
+        <label>Email Address</label>
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <input type="email" name="email" placeholder="you@example.com" required>
+        </div>
+        <div class="hint">Confirmation will be sent to this address</div>
       </div>
 
       <div class="field">
         <label>Quantity Required (kg)</label>
-        <input type="number" name="quantity"
-               placeholder="e.g. 50" min="1" max="{{ waste.quantity }}">
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          </div>
+          <input type="number" name="quantity" placeholder="e.g. 50" min="1" max="{{ waste.quantity }}">
+        </div>
+        <div class="hint">Maximum available: {{ waste.quantity }} kg</div>
       </div>
 
       <div class="field">
         <label>Message</label>
-        <textarea name="message"
-                  placeholder="Write your requirements, pickup location, etc."></textarea>
+        <div class="input-wrap">
+          <div class="textarea-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <textarea name="message" placeholder="Describe your requirements, pickup location, preferred schedule…"></textarea>
+        </div>
       </div>
 
       <div class="btn-row">
-        <a href="/consumer/" class="btn-cancel">Cancel</a>
-        <button type="submit" class="btn-submit">Send Request</button>
+        <a href="/consumer/" class="btn-cancel">
+          <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Cancel
+        </a>
+        <button type="submit" class="btn-submit">
+          Send Request
+          <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        </button>
       </div>
 
-    </div>
-  </form>
-  {% endif %}
+    </form>
+    {% endif %}
 
+  </div>
 </div>
 
 </body>

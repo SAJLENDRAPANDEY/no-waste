@@ -36,8 +36,9 @@ def signup(request):
             username = username,
             email    = email,
             password = password,
-            role     = role
         )
+        user.role = role
+        user.save()
 
         return redirect("login")
 

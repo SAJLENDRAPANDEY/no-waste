@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Add Requirement</title>
+
+<style>
+
+body{
+font-family:sans-serif;
+background:#f5f5f5;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.card{
+
+background:white;
+padding:30px;
+border-radius:10px;
+width:400px;
+
+}
+
+input{
+
+width:100%;
+padding:10px;
+margin-bottom:12px;
+border:1px solid #ddd;
+border-radius:6px;
+
+}
+
+button{
+
+padding:10px;
+width:100%;
+border:none;
+background:black;
+color:white;
+border-radius:6px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>Add Waste Requirement</h2>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<input type="text" name="company" placeholder="Company Name" required>
+
+<input type="text" name="waste_type" placeholder="Waste Type" required>
+
+<input type="number" name="quantity" placeholder="Quantity (kg)" required>
+
+<input type="text" name="location" placeholder="Location" required>
+
+<button type="submit">Submit Requirement</button>
+
+</form>
+
+</div>
+
+</body>
+</html>

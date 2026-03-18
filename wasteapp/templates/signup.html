@@ -1,294 +1,1260 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Up – Waste-Not</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up — Waste-Not</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:         #f5f1ea;
+  --bg2:        #ede9e1;
+  --surface:    #faf8f4;
+  --surface2:   #f0ede6;
+  --border:     #ddd8cf;
+  --border2:    #c9c3b8;
+  --ink:        #1c1a16;
+  --ink2:       #514d46;
+  --ink3:       #96918a;
+  --accent:     #2e6b4f;
+  --accent-lt:  #e1f0e8;
+  --accent-md:  #3d8e68;
+  --amber:      #b8711e;
+  --amber-lt:   #fef3e2;
+  --red:        #a83228;
+  --red-lt:     #fcecea;
+  --blue:       #2a4a80;
+  --blue-lt:    #e2eaf8;
+  --panel-bg:   #1a1710;
+  --panel-ink:  rgba(255,255,255,0.82);
+  --panel-sub:  rgba(255,255,255,0.36);
+  --gold:       #c89b4a;
+}
 
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0d1117;
-      font-family: sans-serif;
-    }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
 
-    .card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 16px;
-      padding: 2rem;
-      width: 100%;
-      max-width: 420px;
-    }
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  display: grid;
+  grid-template-columns: 480px 1fr;
+}
 
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 1.75rem;
-    }
+/* ──────────────────────────────────────
+   LEFT PANEL
+────────────────────────────────────── */
+.panel-left {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  background: var(--panel-bg);
+  display: flex;
+  flex-direction: column;
+  padding: 52px 48px;
+  overflow: hidden;
+}
 
-    .brand-icon {
-      width: 36px; height: 36px;
-      background: #3fb950;
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      font-size: 16px;
-    }
+/* layered background art */
+.panel-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 110% 20%, rgba(46,107,79,0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at -10% 80%, rgba(200,155,74,0.14) 0%, transparent 60%);
+  pointer-events: none;
+}
 
-    .card-header h1 { font-size: 20px; font-weight: 700; color: #e6edf3; margin-bottom: 2px; }
-    .card-header p  { font-size: 13px; color: #7d8590; }
+/* noise grain overlay */
+.panel-left::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 256px;
+  pointer-events: none;
+}
 
-    /* ERROR BOX */
-    .error-box {
-      background: rgba(248,81,73,0.1);
-      border: 1px solid rgba(248,81,73,0.3);
-      border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 1rem;
-      font-size: 13px;
-      color: #f85149;
-    }
+/* decorative ring */
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.06);
+  pointer-events: none;
+}
+.ring-1 { width:520px; height:520px; bottom:-200px; right:-200px; }
+.ring-2 { width:280px; height:280px; top:60px; left:-100px; }
+.ring-3 { width:160px; height:160px; bottom:120px; left:80px; border-color: rgba(200,155,74,0.12); }
 
-    .form-group { display: flex; flex-direction: column; gap: 14px; }
+/* diagonal accent stripe */
+.stripe {
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.05) 40%, rgba(255,255,255,0.05) 60%, transparent);
+  right: 80px;
+  top: 0;
+  transform: rotate(8deg) scaleY(1.2);
+  transform-origin: center;
+  pointer-events: none;
+}
 
-    .field label {
-      display: block;
-      font-size: 12px;
-      color: #7d8590;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+/* BRAND */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  z-index: 2;
+  margin-bottom: auto;
+}
 
-    .field input {
-      width: 100%;
-      padding: 10px 12px;
-      font-size: 14px;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      background: #0d1117;
-      color: #e6edf3;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .field input:focus { border-color: #3fb950; }
+.brand-mark {
+  width: 44px; height: 44px;
+  border-radius: 13px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
 
-    .password-wrapper { position: relative; }
-    .password-wrapper input { padding-right: 36px; }
+.brand-mark svg {
+  width: 22px; height: 22px;
+  stroke: var(--gold);
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 
-    .toggle-btn {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      color: #7d8590;
-      padding: 0;
-    }
+.brand-text { display: flex; flex-direction: column; gap: 1px; }
 
-    /* ROLE SELECTOR */
-    .role-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+.brand-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.2rem;
+  color: white;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
 
-    .role-option {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 14px;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: #0d1117;
-    }
+.brand-tag {
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+}
 
-    .role-icon {
-      width: 32px; height: 32px;
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      font-size: 16px;
-      flex-shrink: 0;
-    }
+/* MAIN COPY */
+.panel-body {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px 0;
+}
 
-    .role-option p       { margin: 0; }
-    .role-option .name   { font-size: 13px; font-weight: 600; color: #e6edf3; }
-    .role-option .desc   { font-size: 11px; color: #7d8590; }
+.eyebrow-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(46,107,79,0.18);
+  border: 1px solid rgba(46,107,79,0.28);
+  border-radius: 100px;
+  padding: 5px 13px 5px 8px;
+  margin-bottom: 24px;
+  width: fit-content;
+}
 
-    /* hide real radio */
-    .role-option input[type="radio"] { display: none; }
+.chip-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent-md);
+  box-shadow: 0 0 8px rgba(61,142,104,0.7);
+  animation: pulse 2s ease-in-out infinite;
+}
 
-    .role-option.active-producer {
-      border-color: #3fb950;
-      background: rgba(63,185,80,0.08);
-    }
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
 
-    .role-option.active-consumer {
-      border-color: #58a6ff;
-      background: rgba(88,166,255,0.08);
-    }
+.eyebrow-chip span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-md);
+}
 
-    /* TERMS */
-    .terms {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .terms input { width: 15px; height: 15px; accent-color: #3fb950; cursor: pointer; }
-    .terms label { font-size: 13px; color: #7d8590; cursor: pointer; }
-    .terms a { color: #3fb950; text-decoration: underline; }
+.headline {
+  font-family: 'Fraunces', serif;
+  font-size: 3.1rem;
+  font-weight: 300;
+  line-height: 1.08;
+  color: white;
+  letter-spacing: -0.03em;
+  margin-bottom: 20px;
+}
 
-    /* SUBMIT */
-    .signup-btn {
-      margin-top: 6px;
-      width: 100%;
-      padding: 11px;
-      background: #3fb950;
-      color: #0d1117;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      letter-spacing: 0.3px;
-      transition: opacity 0.2s;
-    }
-    .signup-btn:hover { opacity: 0.85; }
+.headline em {
+  font-style: italic;
+  color: var(--gold);
+}
 
-    .login-link {
-      font-size: 12px;
-      color: #7d8590;
-      text-align: center;
-      margin-top: 1.25rem;
-    }
-    .login-link a { color: #3fb950; text-decoration: underline; }
-  </style>
+.panel-desc {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--panel-sub);
+  line-height: 1.8;
+  max-width: 300px;
+  margin-bottom: 44px;
+}
+
+/* STEPS */
+.steps { display: flex; flex-direction: column; gap: 0; }
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 0;
+  position: relative;
+}
+
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 42px;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255,255,255,0.06);
+}
+
+.step-num {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.4);
+  font-size: 0.72rem;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.04);
+  font-family: 'DM Serif Display', serif;
+  transition: all 0.3s;
+}
+
+.step:hover .step-num {
+  background: rgba(46,107,79,0.2);
+  border-color: rgba(46,107,79,0.4);
+  color: var(--accent-md);
+}
+
+.step-content { padding-top: 4px; }
+
+.step-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 2px;
+  transition: color 0.3s;
+}
+
+.step:hover .step-title { color: white; }
+
+.step-desc {
+  font-size: 0.78rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.3);
+}
+
+/* PANEL FOOTER */
+.panel-footer {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+
+.panel-copy {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.2);
+  font-weight: 300;
+}
+
+.panel-footer-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.25);
+}
+
+.panel-footer-badge svg {
+  width: 11px; height: 11px;
+  stroke: var(--gold);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* ──────────────────────────────────────
+   RIGHT PANEL
+────────────────────────────────────── */
+.panel-right {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 60px 48px 60px 56px;
+  overflow-y: auto;
+  background: var(--bg);
+  position: relative;
+}
+
+/* subtle background texture */
+.panel-right::before {
+  content: '';
+  position: fixed;
+  top: 0; right: 0;
+  width: calc(100% - 480px);
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.018'/%3E%3C/svg%3E");
+  background-size: 300px;
+  pointer-events: none;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 440px;
+  animation: slideUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(28px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* FORM HEADER */
+.form-header { margin-bottom: 36px; }
+
+.form-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-eyebrow::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 1.5px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.form-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2.4rem;
+  color: var(--ink);
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.form-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.form-subtitle {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--ink3);
+  line-height: 1.6;
+}
+
+/* ERROR BOX */
+.error-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--red-lt);
+  border: 1px solid rgba(168,50,40,0.2);
+  border-radius: 12px;
+  padding: 13px 16px;
+  margin-bottom: 24px;
+  animation: shakeIn 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes shakeIn {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+.error-icon {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--red);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.error-icon svg {
+  width: 10px; height: 10px;
+  stroke: white;
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.error-text {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--red);
+  line-height: 1.5;
+}
+
+/* FIELDS */
+.field-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.field { margin-bottom: 16px; }
+.field.no-gap { margin-bottom: 0; }
+
+.field-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.field-label label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink2);
+}
+
+.field-hint {
+  font-size: 0.7rem;
+  color: var(--ink3);
+  font-weight: 400;
+}
+
+.input-wrap { position: relative; }
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--ink3);
+  display: grid;
+  place-items: center;
+  transition: color 0.2s;
+}
+
+.input-icon svg {
+  width: 15px; height: 15px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  -webkit-appearance: none;
+}
+
+input::placeholder { color: var(--ink3); }
+
+input:hover:not(:focus) {
+  border-color: var(--border2);
+  background: #fff;
+}
+
+input:focus {
+  background: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3.5px rgba(46,107,79,0.1);
+}
+
+input:focus + .floating-label,
+.input-wrap:focus-within .input-icon { color: var(--accent); }
+
+.toggle-btn {
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink3);
+  padding: 4px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.toggle-btn:hover {
+  color: var(--ink);
+  background: var(--bg2);
+}
+
+.toggle-btn svg {
+  width: 16px; height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* PASSWORD STRENGTH */
+.strength-bar {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.strength-segment {
+  flex: 1;
+  height: 3px;
+  border-radius: 99px;
+  background: var(--border);
+  transition: background 0.3s;
+}
+
+.strength-label {
+  font-size: 0.7rem;
+  color: var(--ink3);
+  margin-top: 5px;
+  font-weight: 400;
+  min-height: 14px;
+}
+
+/* ROLE SELECTOR */
+.role-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink2);
+  margin-bottom: 12px;
+  display: block;
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.role-card {
+  position: relative;
+  padding: 16px 16px 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  user-select: none;
+  overflow: hidden;
+}
+
+.role-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.role-card:hover {
+  border-color: var(--border2);
+  background: var(--surface2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.role-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+}
+
+.role-card.active-producer {
+  border-color: var(--accent);
+  background: var(--accent-lt);
+  box-shadow: 0 4px 20px rgba(46,107,79,0.12), inset 0 1px 0 rgba(255,255,255,0.5);
+  transform: translateY(-2px);
+}
+
+.role-card.active-consumer {
+  border-color: var(--blue);
+  background: var(--blue-lt);
+  box-shadow: 0 4px 20px rgba(42,74,128,0.12), inset 0 1px 0 rgba(255,255,255,0.5);
+  transform: translateY(-2px);
+}
+
+.role-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.role-emoji {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 1.15rem;
+  background: var(--bg2);
+  transition: background 0.2s;
+}
+
+.role-card.active-producer .role-emoji { background: rgba(46,107,79,0.12); }
+.role-card.active-consumer .role-emoji { background: rgba(42,74,128,0.12); }
+
+.role-check {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  display: grid;
+  place-items: center;
+  transition: all 0.2s;
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.role-check svg {
+  width: 10px; height: 10px;
+  stroke: white;
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.role-card.active-producer .role-check {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.role-card.active-consumer .role-check {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.role-card.active-producer .role-check svg,
+.role-card.active-consumer .role-check svg { opacity: 1; }
+
+.role-name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 2px;
+  transition: color 0.2s;
+}
+
+.role-card.active-producer .role-name { color: var(--accent); }
+.role-card.active-consumer .role-name { color: var(--blue); }
+
+.role-desc {
+  font-size: 0.75rem;
+  font-weight: 300;
+  color: var(--ink3);
+  line-height: 1.4;
+}
+
+/* TERMS */
+.terms-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 22px;
+  cursor: pointer;
+}
+
+.custom-check {
+  width: 18px; height: 18px;
+  border: 1.5px solid var(--border2);
+  border-radius: 5px;
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all 0.2s;
+}
+
+.custom-check svg {
+  width: 10px; height: 10px;
+  stroke: white;
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+input#terms:checked ~ .terms-row .custom-check,
+.terms-row.checked .custom-check {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.terms-row input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+}
+
+.terms-text {
+  font-size: 0.84rem;
+  color: var(--ink2);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.terms-text a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(46,107,79,0.3);
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.terms-text a:hover {
+  border-color: var(--accent);
+}
+
+/* SUBMIT BUTTON */
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(28,26,22,0.15), 0 8px 24px rgba(28,26,22,0.08);
+}
+
+.btn-submit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-md) 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.btn-submit:hover::before { opacity: 1; }
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(46,107,79,0.3), 0 12px 32px rgba(46,107,79,0.15);
+}
+
+.btn-submit:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(28,26,22,0.15);
+}
+
+.btn-submit span, .btn-submit svg {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-submit svg {
+  width: 16px; height: 16px;
+  stroke: white;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.25s;
+}
+
+.btn-submit:hover svg { transform: translateX(4px); }
+
+/* DIVIDER */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 24px 0 20px;
+}
+
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.divider span {
+  font-size: 0.75rem;
+  color: var(--ink3);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+/* LOGIN PROMPT */
+.login-prompt {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--ink3);
+  font-weight: 300;
+}
+
+.login-prompt a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(46,107,79,0.3);
+  transition: border-color 0.15s;
+}
+
+.login-prompt a:hover { border-color: var(--accent); }
+
+/* TRUST ROW */
+.trust-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--ink3);
+  letter-spacing: 0.02em;
+}
+
+.trust-item svg {
+  width: 14px; height: 14px;
+  stroke: var(--accent-md);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Stagger animations for form fields */
+.field:nth-child(1) { animation: fadeSlide 0.4s 0.1s ease both; }
+.field:nth-child(2) { animation: fadeSlide 0.4s 0.16s ease both; }
+.field-group       { animation: fadeSlide 0.4s 0.22s ease both; }
+.role-section      { animation: fadeSlide 0.4s 0.28s ease both; }
+.terms-row         { animation: fadeSlide 0.4s 0.32s ease both; }
+.btn-submit        { animation: fadeSlide 0.4s 0.36s ease both; }
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE ─────────────────── */
+@media (max-width: 900px) {
+  body { grid-template-columns: 1fr; }
+  .panel-left { display: none; }
+  .panel-right { padding: 40px 20px; }
+  .panel-right::before { width: 100%; left: 0; }
+}
+
+@media (max-width: 500px) {
+  .field-group { grid-template-columns: 1fr; }
+  .role-grid { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body>
 
-<div class="card">
+<!-- ── LEFT PANEL ── -->
+<div class="panel-left">
+  <div class="ring ring-1"></div>
+  <div class="ring ring-2"></div>
+  <div class="ring ring-3"></div>
+  <div class="stripe"></div>
 
-  <div class="card-header">
-    <div class="brand-icon">♻️</div>
-    <div>
-      <h1>Create Account</h1>
-      <p>Join the circular economy</p>
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+        <path d="M8 12l2.5 2.5L16 9"/>
+        <circle cx="12" cy="12" r="3" stroke-opacity="0.4"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <div class="brand-name">Waste-Not</div>
+      <div class="brand-tag">Management System</div>
     </div>
   </div>
 
-  {% if error %}
-  <div class="error-box">{{ error }}</div>
-  {% endif %}
+  <div class="panel-body">
+    <div class="eyebrow-chip">
+      <div class="chip-dot"></div>
+      <span>Now live · Join free</span>
+    </div>
 
-  <form method="POST">
-    {% csrf_token %}
+    <h2 class="headline">
+      Join the<br>
+      <em>circular</em><br>
+      economy.
+    </h2>
 
-    <div class="form-group">
+    <p class="panel-desc">
+      Connect producers, consumers, and recyclers on one unified platform — reduce waste, generate value.
+    </p>
 
-      <div class="field">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username"
-               placeholder="Enter your username" autocomplete="username">
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <div class="step-title">Create your account</div>
+          <div class="step-desc">Set up in under 2 minutes, no credit card needed</div>
+        </div>
       </div>
-
-      <div class="field">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email"
-               placeholder="Enter your email" autocomplete="email">
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <div class="step-title">Choose your role</div>
+          <div class="step-desc">Producer or consumer — switch anytime</div>
+        </div>
       </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <div class="step-title">Start transacting</div>
+          <div class="step-desc">List, request, and manage waste efficiently</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <div class="panel-footer">
+    <div class="panel-copy">© 2025 Waste-Not · All rights reserved</div>
+    <div class="panel-footer-badge">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      SOC 2 Type II
+    </div>
+  </div>
+</div>
+
+<!-- ── RIGHT PANEL ── -->
+<div class="panel-right">
+  <div class="form-container">
+
+    <div class="form-header">
+      <div class="form-eyebrow">Get started free</div>
+      <h1 class="form-title">Create your<br><em>account</em></h1>
+      <p class="form-subtitle">Fill in your details below to get started with Waste-Not.</p>
+    </div>
+
+    {% if error %}
+    <div class="error-box">
+      <div class="error-icon">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+      <div class="error-text">{{ error }}</div>
+    </div>
+    {% endif %}
+
+    <form method="POST" id="signupForm">
+      {% csrf_token %}
+
+      <!-- USERNAME -->
       <div class="field">
-        <label for="password">Password</label>
-        <div class="password-wrapper">
-          <input type="password" id="password" name="password"
-                 placeholder="••••••••" autocomplete="new-password">
-          <button type="button" class="toggle-btn"
-            onclick="var i=document.getElementById('password');i.type=i.type==='password'?'text':'password';this.textContent=i.type==='password'?'👁':'🙈';">👁</button>
+        <div class="field-label">
+          <label for="username">Username</label>
+        </div>
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          </div>
+          <input type="text" id="username" name="username"
+                 placeholder="Choose a username" autocomplete="username" required>
         </div>
       </div>
 
+      <!-- EMAIL -->
       <div class="field">
-        <label for="confirm_password">Confirm Password</label>
-        <div class="password-wrapper">
-          <input type="password" id="confirm_password" name="confirm_password"
-                 placeholder="••••••••" autocomplete="new-password">
-          <button type="button" class="toggle-btn"
-            onclick="var i=document.getElementById('confirm_password');i.type=i.type==='password'?'text':'password';this.textContent=i.type==='password'?'👁':'🙈';">👁</button>
+        <div class="field-label">
+          <label for="email">Email Address</label>
+        </div>
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <input type="email" id="email" name="email"
+                 placeholder="you@example.com" autocomplete="email" required>
+        </div>
+      </div>
+
+      <!-- PASSWORDS (side by side) -->
+      <div class="field-group">
+        <div class="field no-gap">
+          <div class="field-label">
+            <label for="password">Password</label>
+            <span class="field-hint" id="strength-label"></span>
+          </div>
+          <div class="input-wrap">
+            <div class="input-icon">
+              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <input type="password" id="password" name="password"
+                   placeholder="Min. 8 characters" autocomplete="new-password"
+                   oninput="checkStrength(this.value)" required minlength="8">
+            <button type="button" class="toggle-btn" onclick="togglePass('password','eye1')" tabindex="-1">
+              <svg id="eye1" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="strength-bar" id="strength-bar">
+            <div class="strength-segment" id="s1"></div>
+            <div class="strength-segment" id="s2"></div>
+            <div class="strength-segment" id="s3"></div>
+            <div class="strength-segment" id="s4"></div>
+          </div>
+        </div>
+
+        <div class="field no-gap">
+          <div class="field-label">
+            <label for="confirm_password">Confirm</label>
+          </div>
+          <div class="input-wrap">
+            <div class="input-icon">
+              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <input type="password" id="confirm_password" name="confirm_password"
+                   placeholder="Re-enter password" autocomplete="new-password" required>
+            <button type="button" class="toggle-btn" onclick="togglePass('confirm_password','eye2')" tabindex="-1">
+              <svg id="eye2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
         </div>
       </div>
 
       <!-- ROLE SELECTOR -->
-      <div class="field">
-        <label>Select Role</label>
+      <div class="role-section" style="margin-bottom: 20px;">
+        <span class="role-label">Select Your Role</span>
         <div class="role-grid">
 
-          <label class="role-option" id="card-producer"
-                 onclick="selectRole('producer')">
+          <label class="role-card" id="card-producer" onclick="selectRole('producer')">
             <input type="radio" name="role" value="producer">
-            <div class="role-icon" style="background:rgba(63,185,80,0.1);">🏭</div>
-            <div>
-              <p class="name">Producer</p>
-              <p class="desc">Add waste</p>
+            <div class="role-top">
+              <div class="role-emoji">🏭</div>
+              <div class="role-check">
+                <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+              </div>
             </div>
+            <div class="role-name">Producer</div>
+            <div class="role-desc">List & manage surplus waste</div>
           </label>
 
-          <label class="role-option" id="card-consumer"
-                 onclick="selectRole('consumer')">
+          <label class="role-card" id="card-consumer" onclick="selectRole('consumer')">
             <input type="radio" name="role" value="consumer">
-            <div class="role-icon" style="background:rgba(88,166,255,0.1);">🛒</div>
-            <div>
-              <p class="name">Consumer</p>
-              <p class="desc">Buy waste</p>
+            <div class="role-top">
+              <div class="role-emoji">🛒</div>
+              <div class="role-check">
+                <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+              </div>
             </div>
+            <div class="role-name">Consumer</div>
+            <div class="role-desc">Browse & request materials</div>
           </label>
 
         </div>
       </div>
 
-      <div class="terms">
-        <input type="checkbox" id="terms" name="terms">
-        <label for="terms">I agree to the <a href="#">Terms & Conditions</a></label>
+      <!-- TERMS -->
+      <label class="terms-row" id="termsRow">
+        <input type="checkbox" id="terms" name="terms" onchange="syncTermsCheck(this)">
+        <div class="custom-check" id="customCheck">
+          <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+        </div>
+        <span class="terms-text">
+          I agree to the <a href="#" onclick="event.stopPropagation(); return false;">Terms & Conditions</a> and <a href="#" onclick="event.stopPropagation(); return false;">Privacy Policy</a>
+        </span>
+      </label>
+
+      <!-- SUBMIT -->
+      <button type="submit" class="btn-submit">
+        <span>Create Account</span>
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+
+    </form>
+
+    <div class="divider"><span>Already a member?</span></div>
+
+    <p class="login-prompt">
+      Have an account? <a href="{% url 'login' %}">Sign in instead →</a>
+    </p>
+
+    <div class="trust-row">
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Secure & Encrypted
       </div>
-
-      <button type="submit" class="signup-btn">Create Account</button>
-
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+        Free Forever
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Trusted Platform
+      </div>
     </div>
-  </form>
 
-  <p class="login-link">
-    Already have an account? <a href="{% url 'login' %}">Login</a>
-  </p>
-
+  </div>
 </div>
 
 <script>
-  function selectRole(role) {
-    var p = document.getElementById('card-producer');
-    var c = document.getElementById('card-consumer');
-
-    p.classList.remove('active-producer');
-    c.classList.remove('active-consumer');
-
-    if (role === 'producer') {
-      p.classList.add('active-producer');
-      p.querySelector('input[type="radio"]').checked = true;
-    } else {
-      c.classList.add('active-consumer');
-      c.querySelector('input[type="radio"]').checked = true;
-    }
+/* Role selection */
+function selectRole(role) {
+  const p = document.getElementById('card-producer');
+  const c = document.getElementById('card-consumer');
+  p.classList.remove('active-producer');
+  c.classList.remove('active-consumer');
+  if (role === 'producer') {
+    p.classList.add('active-producer');
+    p.querySelector('input').checked = true;
+  } else {
+    c.classList.add('active-consumer');
+    c.querySelector('input').checked = true;
   }
+}
+
+/* Password toggle */
+function togglePass(id, iconId) {
+  const inp = document.getElementById(id);
+  const icon = document.getElementById(iconId);
+  const isHidden = inp.type === 'password';
+  inp.type = isHidden ? 'text' : 'password';
+  icon.innerHTML = isHidden
+    ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
+    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+}
+
+/* Password strength */
+function checkStrength(val) {
+  const segs = ['s1','s2','s3','s4'];
+  const label = document.getElementById('strength-label');
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+
+  const colors = ['#b03a2e','#c47c2b','#2c4f8a','#2e6b4f'];
+  const labels = ['Weak','Fair','Good','Strong'];
+  const labelColors = ['#b03a2e','#c47c2b','#2c4f8a','#2e6b4f'];
+
+  segs.forEach((id, i) => {
+    document.getElementById(id).style.background =
+      i < score ? colors[score - 1] : 'var(--border)';
+  });
+
+  label.textContent = val.length > 0 ? labels[score - 1] || '' : '';
+  label.style.color = val.length > 0 && score > 0 ? labelColors[score - 1] : 'var(--ink3)';
+}
+
+/* Sync custom checkbox visual with native state */
+function syncTermsCheck(cb) {
+  const check = document.getElementById('customCheck');
+  if (cb.checked) {
+    check.style.background = 'var(--accent)';
+    check.style.borderColor = 'var(--accent)';
+    check.querySelector('svg').style.opacity = '1';
+  } else {
+    check.style.background = 'var(--surface)';
+    check.style.borderColor = 'var(--border2)';
+    check.querySelector('svg').style.opacity = '0';
+  }
+}
+
+/* Client-side password match validation */
+document.getElementById('signupForm').addEventListener('submit', function(e) {
+  const pw  = document.getElementById('password').value;
+  const cpw = document.getElementById('confirm_password').value;
+  const terms = document.getElementById('terms');
+  if (pw !== cpw) {
+    e.preventDefault();
+    document.getElementById('confirm_password').setCustomValidity('Passwords do not match.');
+    document.getElementById('confirm_password').reportValidity();
+    return;
+  }
+  document.getElementById('confirm_password').setCustomValidity('');
+  if (!terms.checked) {
+    e.preventDefault();
+    alert('Please agree to the Terms & Conditions to continue.');
+  }
+});
 </script>
 
 </body>

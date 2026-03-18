@@ -1,455 +1,771 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Waste-Not Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root {
-      --bg:         #0d1117;
-      --surface:    #161b22;
-      --surface2:   #1c2330;
-      --border:     #30363d;
-      --green:      #3fb950;
-      --green-dim:  #1a3a23;
-      --accent:     #58a6ff;
-      --warn:       #e3b341;
-      --text:       #e6edf3;
-      --muted:      #7d8590;
-      --red:        #f85149;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waste-Not Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+<style>
+:root {
+  --bg:        #f0ede8;
+  --bg2:       #e8e4de;
+  --bg3:       #e0dbd4;
+  --surface:   #ffffff;
+  --surface2:  #f7f5f2;
+  --border:    #dedad4;
+  --border2:   #ccc8c0;
+  --ink:       #1a1814;
+  --ink2:      #5a5650;
+  --ink3:      #9a9590;
+  --accent:    #2a6049;
+  --accent-lt: #d4ede5;
+  --accent-md: #4f9e84;
+  --amber:     #c47c2b;
+  --amber-lt:  #fdf0dc;
+  --red:       #b03a2e;
+  --red-lt:    #fcecea;
+  --blue:      #2c4f8a;
+  --blue-lt:   #dce6f5;
+  --purple:    #5c3d8a;
+  --purple-lt: #ede6f7;
+  --slate:     #3d4a5c;
+  --slate-lt:  #e4e8ef;
+  --sidebar-w: 270px;
+}
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      min-height: 100vh;
-    }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
 
-    /* ── NAVBAR ── */
-    nav {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0 2rem;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-    .nav-brand { display: flex; align-items: center; gap: 10px; }
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  background-size: 200px;
+  pointer-events: none;
+  z-index: 0;
+}
 
-    .nav-icon {
-      width: 32px; height: 32px;
-      background: var(--green);
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      font-size: 16px;
-    }
+/* ── NAVBAR ────────────────────── */
+.navbar {
+  position: sticky; top: 0; z-index: 200;
+  height: 64px;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+}
 
-    .nav-title {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 18px;
-    }
-    .nav-title span { color: var(--green); }
+.nav-brand {
+  display: flex; align-items: center; gap: 12px;
+}
 
-    .nav-badge {
-      background: var(--green-dim);
-      color: var(--green);
-      font-size: 10px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 20px;
-      border: 1px solid var(--green);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+.brand-mark {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+}
 
-    .nav-actions { display: flex; gap: 10px; align-items: center; }
+.brand-mark svg {
+  width: 18px; height: 18px;
+  stroke: white; fill: none;
+  stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+}
 
-    .btn {
-      padding: 7px 18px;
-      border-radius: 8px;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500;
-      font-size: 14px;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s;
-      text-decoration: none;
-    }
+.brand-name {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700; font-size: 1.1rem;
+  color: var(--ink);
+}
 
-    .btn-ghost {
-      background: transparent;
-      color: var(--muted);
-      border: 1px solid var(--border);
-    }
-    .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+.brand-sub {
+  font-size: 0.68rem; color: var(--ink3);
+  font-weight: 300; letter-spacing: 0.08em;
+  text-transform: uppercase; margin-top: -3px;
+}
 
-    .btn-primary {
-      background: var(--green);
-      color: #0d1117;
-      font-weight: 600;
-    }
-    .btn-primary:hover { background: #4fc762; transform: translateY(-1px); }
+.nav-center {
+  display: flex; align-items: center; gap: 4px;
+}
 
-    /* ── LAYOUT ── */
-    .layout { display: flex; min-height: calc(100vh - 64px); }
+.nav-link {
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-weight: 500;
+  color: var(--ink2);
+  text-decoration: none;
+  transition: all 0.15s;
+}
 
-    /* ── SIDEBAR ── */
-    .sidebar {
-      width: 260px;
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      padding: 1.5rem 1.2rem;
-      flex-shrink: 0;
-    }
+.nav-link:hover, .nav-link.active {
+  background: var(--surface2);
+  color: var(--ink);
+}
 
-    .sidebar h3 {
-      font-family: 'Syne', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--muted);
-      margin-bottom: 1rem;
-    }
+.nav-right { display: flex; align-items: center; gap: 10px; }
 
-    .stock-item {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      transition: border-color 0.2s;
-    }
-    .stock-item:hover { border-color: var(--green); }
+.btn-nav-ghost {
+  padding: 7px 18px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.83rem; font-weight: 500;
+  color: var(--ink2); cursor: pointer;
+  text-decoration: none; transition: all 0.2s;
+}
 
-    .stock-company {
-      font-weight: 500;
-      font-size: 14px;
-      margin-bottom: 4px;
-    }
+.btn-nav-ghost:hover {
+  border-color: var(--ink); color: var(--ink);
+}
 
-    .stock-meta {
-      font-size: 12px;
-      color: var(--muted);
-      display: flex;
-      justify-content: space-between;
-    }
+.btn-nav-primary {
+  padding: 7px 20px;
+  background: var(--ink);
+  border: none;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.83rem; font-weight: 600;
+  color: white; cursor: pointer;
+  text-decoration: none; transition: all 0.2s;
+}
 
-    .stock-qty {
-      color: var(--green);
-      font-weight: 600;
-      font-size: 12px;
-    }
+.btn-nav-primary:hover {
+  background: var(--accent);
+  transform: translateY(-1px);
+}
 
-    /* ── MAIN ── */
-    .main {
-      flex: 1;
-      padding: 2rem 1.5rem;
-      overflow-x: hidden;
-    }
+/* ── LAYOUT ───────────────────── */
+.layout {
+  display: flex;
+  position: relative; z-index: 1;
+  min-height: calc(100vh - 64px);
+}
 
-    /* ── STAT CARDS ── */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
+/* ── SIDEBAR ──────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 28px 18px;
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+}
 
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.1rem 1.3rem;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: border-color 0.2s;
-      animation: fadeUp 0.4s ease both;
-    }
-    .stat-card:hover { border-color: var(--green); }
-    .stat-card:nth-child(1) { animation-delay: 0.05s; }
-    .stat-card:nth-child(2) { animation-delay: 0.10s; }
-    .stat-card:nth-child(3) { animation-delay: 0.15s; }
-    .stat-card:nth-child(4) { animation-delay: 0.20s; }
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-    .stat-icon {
-      width: 40px; height: 40px;
-      border-radius: 10px;
-      display: grid;
-      place-items: center;
-      font-size: 18px;
-      flex-shrink: 0;
-    }
+.sidebar-section-label {
+  font-size: 0.67rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink3);
+  margin-bottom: 12px;
+  padding: 0 6px;
+  display: flex; align-items: center; gap: 8px;
+}
 
-    .stat-label { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
-    .stat-value { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; }
-    .stat-delta { font-size: 11px; color: var(--green); margin-top: 2px; }
+.sidebar-section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
 
-    /* ── CARD ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1.4rem;
-      animation: fadeUp 0.4s ease both;
-    }
+.stock-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
 
-    .card-title {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      margin-bottom: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .card-title::before {
-      content: '';
-      display: inline-block;
-      width: 3px; height: 14px;
-      background: var(--green);
-      border-radius: 2px;
-    }
+.stock-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--accent), var(--accent-md));
+  border-radius: 3px 0 0 3px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
 
-    /* ── CHARTS GRID ── */
-    .main-chart { margin-bottom: 1.5rem; animation-delay: 0.25s; }
+.stock-item:hover {
+  border-color: var(--border2);
+  background: var(--bg2);
+  transform: translateX(3px);
+}
 
-    .charts-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.2rem;
-      margin-bottom: 1.5rem;
-    }
-    .charts-grid .card:nth-child(1) { animation-delay: 0.30s; }
-    .charts-grid .card:nth-child(2) { animation-delay: 0.35s; }
-    .charts-grid .card:nth-child(3) { animation-delay: 0.40s; }
+.stock-item:hover::before { opacity: 1; }
 
-    /* ── TABLE ── */
-    .table-card { animation-delay: 0.45s; }
-    .table-wrap { overflow-x: auto; }
+.stock-company {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.stock-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    thead tr { border-bottom: 1px solid var(--border); }
+.stock-type {
+  font-size: 0.72rem;
+  color: var(--ink3);
+  font-weight: 400;
+}
 
-    thead th {
-      text-align: left;
-      padding: 10px 14px;
-      font-family: 'Syne', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
+.stock-qty {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: 'DM Mono', monospace;
+}
 
-    tbody tr {
-      border-bottom: 1px solid rgba(48,54,61,0.5);
-      transition: background 0.15s;
-    }
-    tbody tr:hover { background: var(--surface2); }
-    tbody tr:last-child { border-bottom: none; }
+.sidebar-empty {
+  text-align: center;
+  padding: 28px 12px;
+  color: var(--ink3);
+  font-size: 0.83rem;
+  font-weight: 300;
+}
 
-    td { padding: 12px 14px; }
+.sidebar-empty .empty-icon {
+  font-size: 1.8rem;
+  opacity: 0.3;
+  margin-bottom: 8px;
+}
 
-    .badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-    .badge-plastic { background: rgba(248,81,73,0.15);  color: #f85149; }
-    .badge-wood    { background: rgba(227,179,65,0.15); color: #e3b341; }
-    .badge-metal   { background: rgba(88,166,255,0.15); color: #58a6ff; }
-    .badge-paper   { background: rgba(63,185,80,0.15);  color: #3fb950; }
+/* ── MAIN ─────────────────────── */
+.main {
+  flex: 1;
+  padding: 36px 36px 56px;
+  min-width: 0;
+}
 
-    .location-dot {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      color: var(--muted);
-    }
-    .location-dot::before { content: '◉'; font-size: 9px; color: var(--green); }
+/* PAGE HEADER */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border2);
+  animation: riseIn 0.4s ease both;
+}
 
-    /* ── ANIMATION ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+@keyframes riseIn {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 1100px) {
-      .stats-row    { grid-template-columns: repeat(2, 1fr); }
-      .charts-grid  { grid-template-columns: 1fr; }
-    }
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; font-weight: 700;
+  color: var(--ink); line-height: 1.15;
+  letter-spacing: -0.02em;
+}
 
-    @media (max-width: 700px) {
-      .sidebar      { display: none; }
-      .stats-row    { grid-template-columns: 1fr 1fr; }
-    }
-  </style>
+.page-title span {
+  display: block;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem; font-weight: 400;
+  color: var(--ink3); letter-spacing: 0.08em;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+
+.date-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 7px 15px; border-radius: 40px;
+  font-size: 0.78rem; color: var(--ink2);
+}
+
+.dot-live {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: livePulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes livePulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.4; transform:scale(0.7); }
+}
+
+/* SECTION LABEL */
+.sec-label {
+  font-size: 0.67rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink3);
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+
+.sec-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* ── KPI STRIP ────────────────── */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: riseIn 0.5s ease both;
+}
+
+.kpi:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+}
+
+.kpi:nth-child(1) { animation-delay: 0.05s; }
+.kpi:nth-child(2) { animation-delay: 0.10s; }
+.kpi:nth-child(3) { animation-delay: 0.15s; }
+.kpi:nth-child(4) { animation-delay: 0.20s; }
+
+.kpi-accent-bar {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; border-radius: 14px 0 0 14px;
+}
+
+.kpi.c-green  .kpi-accent-bar { background: var(--accent); }
+.kpi.c-amber  .kpi-accent-bar { background: var(--amber); }
+.kpi.c-blue   .kpi-accent-bar { background: var(--blue); }
+.kpi.c-purple .kpi-accent-bar { background: var(--purple); }
+
+.kpi-icon {
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; margin-bottom: 12px;
+}
+
+.kpi.c-green  .kpi-icon { background: var(--accent-lt); }
+.kpi.c-amber  .kpi-icon { background: var(--amber-lt); }
+.kpi.c-blue   .kpi-icon { background: var(--blue-lt); }
+.kpi.c-purple .kpi-icon { background: var(--purple-lt); }
+
+.kpi-label {
+  font-size: 0.68rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--ink3); margin-bottom: 5px;
+}
+
+.kpi-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.9rem; font-weight: 700;
+  color: var(--ink); line-height: 1;
+}
+
+.kpi.c-green  .kpi-value { color: var(--accent); }
+.kpi.c-amber  .kpi-value { color: var(--amber); }
+.kpi.c-blue   .kpi-value { color: var(--blue); }
+.kpi.c-purple .kpi-value { color: var(--purple); }
+
+.kpi-sub {
+  font-size: 0.72rem; color: var(--ink3);
+  font-weight: 300; margin-top: 4px;
+}
+
+/* ── CARDS ────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  animation: riseIn 0.5s ease both;
+  transition: border-color 0.2s;
+}
+
+.card:hover { border-color: var(--border2); }
+
+.card-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.card-title {
+  display: flex; align-items: center; gap: 9px;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.98rem; font-weight: 700;
+  color: var(--ink);
+}
+
+.card-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.card-tag {
+  font-size: 0.67rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 3px 10px; border-radius: 20px;
+  background: var(--bg2); color: var(--ink3);
+  border: 1px solid var(--border2);
+}
+
+.card-body { padding: 20px 22px; }
+
+/* CHARTS GRID */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.chart-wrap {
+  position: relative;
+  height: 200px;
+}
+
+/* FULL WIDTH CHART */
+.chart-full {
+  position: relative;
+  height: 210px;
+}
+
+/* ── TABLE ────────────────────── */
+.table-scroll { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; }
+
+thead tr {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border2);
+}
+
+thead th {
+  padding: 10px 18px;
+  font-size: 0.67rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--ink3); text-align: left;
+  white-space: nowrap;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface2); }
+
+tbody td {
+  padding: 13px 18px;
+  font-size: 0.875rem; color: var(--ink);
+  vertical-align: middle;
+}
+
+/* BADGES */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.04em; white-space: nowrap;
+}
+
+.badge-plastic   { background: var(--blue-lt);   color: var(--blue);   border: 1px solid #bfcfe8; }
+.badge-metal     { background: var(--slate-lt);  color: var(--slate);  border: 1px solid #c8cdd6; }
+.badge-organic   { background: var(--accent-lt); color: var(--accent); border: 1px solid #b8ddd4; }
+.badge-chemical  { background: var(--amber-lt);  color: var(--amber);  border: 1px solid #e8c890; }
+.badge-electronic{ background: var(--purple-lt); color: var(--purple); border: 1px solid #c8b8e8; }
+.badge-paper     { background: var(--accent-lt); color: var(--accent); border: 1px solid #b8ddd4; }
+.badge-default   { background: var(--slate-lt);  color: var(--slate);  border: 1px solid #c8cdd6; }
+
+.qty-mono {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.83rem; font-weight: 500;
+  color: var(--accent);
+}
+
+/* EMPTY TABLE */
+.empty {
+  padding: 44px 20px; text-align: center;
+}
+.empty-icon { font-size: 2rem; opacity: 0.3; margin-bottom: 10px; }
+.empty-text { font-size: 0.83rem; color: var(--ink3); font-weight: 300; }
+
+/* ROW SPACER */
+.row-gap { margin-bottom: 20px; }
+
+@media (max-width: 1200px) {
+  .kpi-strip { grid-template-columns: repeat(2,1fr); }
+  .charts-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main { padding: 24px 18px 48px; }
+  .charts-grid { grid-template-columns: 1fr; }
+  .kpi-strip { grid-template-columns: repeat(2,1fr); }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+}
+</style>
 </head>
 <body>
 
-<!-- NAVBAR -->
-<nav>
+<!-- ── NAVBAR ──────────────────────────── -->
+<nav class="navbar">
   <div class="nav-brand">
-    <div class="nav-icon">♻️</div>
-    <span class="nav-title">Waste<span>-Not</span></span>
-    <span class="nav-badge">Live</span>
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24">
+        <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+        <path d="M10 11v6M14 11v6"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">Waste-Not</div>
+      <div class="brand-sub">Management System</div>
+    </div>
   </div>
-  <div class="nav-actions">
-    <a href="{% url 'signup' %}"><button class="btn btn-ghost">Sign up</button></a>
-    <a href="{% url 'login' %}"><button class="btn btn-primary">Login</button></a>
+
+  <div class="nav-center">
+    <a href="#" class="nav-link active">Dashboard</a>
+    <a href="#" class="nav-link">Analytics</a>
+    <a href="#" class="nav-link">Reports</a>
+  </div>
+
+  <div class="nav-right">
+    <a href="/login/" class="btn-nav-ghost">Login</a>
+    <a href="/signup/" class="btn-nav-primary">Get Started →</a>
   </div>
 </nav>
 
-<!-- LAYOUT -->
 <div class="layout">
 
-  <!-- SIDEBAR -->
+  <!-- ── SIDEBAR ──────────────────────── -->
   <div class="sidebar">
-    <h3>Available Stock</h3>
+    <div class="sidebar-section-label">Available Stock</div>
 
     {% for i in stock %}
     <div class="stock-item">
       <div class="stock-company">{{ i.company }}</div>
       <div class="stock-meta">
-        <span>{{ i.waste_type }}</span>
+        <span class="stock-type">{{ i.waste_type }}</span>
         <span class="stock-qty">{{ i.quantity }} kg</span>
       </div>
     </div>
     {% empty %}
-    <p style="color:var(--muted);font-size:13px;">No stock available</p>
+    <div class="sidebar-empty">
+      <div class="empty-icon">📦</div>
+      No stock available
+    </div>
     {% endfor %}
-
   </div>
 
-  <!-- MAIN -->
+  <!-- ── MAIN ─────────────────────────── -->
   <div class="main">
 
-    <!-- STAT CARDS -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(63,185,80,0.12)">🗂️</div>
-        <div>
-          <div class="stat-label">Total Waste Tracked</div>
-          <div class="stat-value">1,820 <span style="font-size:13px;color:var(--muted)">kg</span></div>
-          <div class="stat-delta">↑ 12% this month</div>
-        </div>
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="page-title">
+        <span>Overview</span>
+        Platform Dashboard
       </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(88,166,255,0.12)">🏭</div>
-        <div>
-          <div class="stat-label">Active Companies</div>
-          <div class="stat-value">5</div>
-          <div class="stat-delta">↑ 2 new this week</div>
-        </div>
+      <div class="date-chip">
+        <div class="dot-live"></div>
+        <span id="liveDate">Loading…</span>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(227,179,65,0.12)">📋</div>
-        <div>
-          <div class="stat-label">Open Requirements</div>
-          <div class="stat-value">5</div>
-          <div class="stat-delta" style="color:var(--warn)">3 urgent</div>
-        </div>
+    </div>
+
+    <!-- KPI STRIP -->
+    <div class="sec-label" style="animation: riseIn 0.4s ease both; animation-delay:0.02s;">Key Metrics</div>
+    <div class="kpi-strip">
+
+      <div class="kpi c-green">
+        <div class="kpi-accent-bar"></div>
+        <div class="kpi-icon">🗂</div>
+        <div class="kpi-label">Total Waste</div>
+        <div class="kpi-value">{{ total }}</div>
+        <div class="kpi-sub">kg tracked</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(248,81,73,0.12)">♻️</div>
-        <div>
-          <div class="stat-label">Recycling Rate</div>
-          <div class="stat-value">68<span style="font-size:13px">%</span></div>
-          <div class="stat-delta">↑ 4% vs last month</div>
+
+      <div class="kpi c-amber">
+        <div class="kpi-accent-bar"></div>
+        <div class="kpi-icon">♻️</div>
+        <div class="kpi-label">Recycled</div>
+        <div class="kpi-value">{{ recycled }}</div>
+        <div class="kpi-sub">kg processed</div>
+      </div>
+
+      <div class="kpi c-blue">
+        <div class="kpi-accent-bar"></div>
+        <div class="kpi-icon">📊</div>
+        <div class="kpi-label">Recycling Rate</div>
+        <div class="kpi-value">{{ rate }}%</div>
+        <div class="kpi-sub">efficiency index</div>
+      </div>
+
+      <div class="kpi c-purple">
+        <div class="kpi-accent-bar"></div>
+        <div class="kpi-icon">🏢</div>
+        <div class="kpi-label">Companies</div>
+        <div class="kpi-value">{{ company_count }}</div>
+        <div class="kpi-sub">active partners</div>
+      </div>
+
+    </div>
+
+    <!-- TOP COMPANIES CHART (full width) -->
+    <div class="sec-label row-gap" style="animation:riseIn 0.5s ease both; animation-delay:0.22s;">Analytics</div>
+    <div class="card row-gap" style="animation-delay:0.24s;">
+      <div class="card-head">
+        <div class="card-title">
+          <div class="card-dot" style="background:var(--accent);"></div>
+          Top Waste Producing Companies
+        </div>
+        <div class="card-tag">All Time</div>
+      </div>
+      <div class="card-body">
+        <div class="chart-full">
+          <canvas id="topCompanies"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- TOP HISTOGRAM -->
-    <div class="card main-chart">
-      <div class="card-title">Top 5 Waste Producing Companies</div>
-      <canvas id="topCompanies" height="80"></canvas>
+    <!-- 3-CHART GRID -->
+    <div class="charts-grid row-gap">
+
+      <div class="card" style="animation-delay:0.28s;">
+        <div class="card-head">
+          <div class="card-title">
+            <div class="card-dot" style="background:var(--blue);"></div>
+            Monthly Trend
+          </div>
+          <div class="card-tag">12 mo</div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap">
+            <canvas id="monthlyTrend"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="animation-delay:0.32s;">
+        <div class="card-head">
+          <div class="card-title">
+            <div class="card-dot" style="background:var(--accent-md);"></div>
+            Waste Split
+          </div>
+          <div class="card-tag">By Type</div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap">
+            <canvas id="availableWaste"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="animation-delay:0.36s;">
+        <div class="card-head">
+          <div class="card-title">
+            <div class="card-dot" style="background:var(--amber);"></div>
+            Distribution
+          </div>
+          <div class="card-tag">Volume</div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap">
+            <canvas id="wasteDistribution"></canvas>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- 3 CHARTS -->
-    <div class="charts-grid">
-      <div class="card">
-        <div class="card-title">Available Waste Material</div>
-        <canvas id="availableWaste"></canvas>
+    <!-- REQUIREMENTS TABLE -->
+    <div class="sec-label" style="animation:riseIn 0.5s ease both; animation-delay:0.38s;">Consumer Requirements</div>
+    <div class="card" style="animation-delay:0.40s;">
+      <div class="card-head">
+        <div class="card-title">
+          <div class="card-dot" style="background:var(--purple);"></div>
+          Active Requirements
+        </div>
+        <div class="card-tag">{{ requirements|length }} requests</div>
       </div>
-      <div class="card">
-        <div class="card-title">Monthly Waste Trend</div>
-        <canvas id="monthlyTrend"></canvas>
-      </div>
-      <div class="card">
-        <div class="card-title">Waste Distribution</div>
-        <canvas id="wasteType"></canvas>
-      </div>
-    </div>
-
-    <!-- TABLE -->
-    <div class="card table-card">
-      <div class="card-title">Consumer Requirements</div>
-      <div class="table-wrap">
+      <div class="table-scroll">
         <table>
           <thead>
             <tr>
+              <th>#</th>
               <th>Company</th>
               <th>Waste Type</th>
               <th>Quantity</th>
               <th>Location</th>
-              <th>Date</th>
             </tr>
           </thead>
           <tbody>
+            {% for r in requirements %}
             <tr>
-              <td><strong>Recycling Plant</strong></td>
-              <td><span class="badge badge-plastic">Plastic</span></td>
-              <td>200 kg</td>
-              <td><span class="location-dot">Delhi</span></td>
-              <td style="color:var(--muted)">12 Mar</td>
+              <td style="color:var(--ink3); font-family:'DM Mono',monospace; font-size:0.78rem;">{{ forloop.counter|stringformat:"02d" }}</td>
+              <td style="font-weight:600;">{{ r.company }}</td>
+              <td>
+                <span class="badge badge-{% if r.waste_type %}{{ r.waste_type|lower }}{% else %}default{% endif %}">
+                  {{ r.waste_type }}
+                </span>
+              </td>
+              <td><span class="qty-mono">{{ r.quantity }} kg</span></td>
+              <td style="color:var(--ink2);">{{ r.location }}</td>
             </tr>
+            {% empty %}
             <tr>
-              <td><strong>Furniture Maker</strong></td>
-              <td><span class="badge badge-wood">Wood</span></td>
-              <td>150 kg</td>
-              <td><span class="location-dot">Gurgaon</span></td>
-              <td style="color:var(--muted)">13 Mar</td>
+              <td colspan="5">
+                <div class="empty">
+                  <div class="empty-icon">📋</div>
+                  <div class="empty-text">No requirements posted yet.</div>
+                </div>
+              </td>
             </tr>
-            <tr>
-              <td><strong>Metal Factory</strong></td>
-              <td><span class="badge badge-metal">Metal</span></td>
-              <td>100 kg</td>
-              <td><span class="location-dot">Noida</span></td>
-              <td style="color:var(--muted)">13 Mar</td>
-            </tr>
-            <tr>
-              <td><strong>Paper Mill</strong></td>
-              <td><span class="badge badge-paper">Paper</span></td>
-              <td>300 kg</td>
-              <td><span class="location-dot">Delhi</span></td>
-              <td style="color:var(--muted)">14 Mar</td>
-            </tr>
-            <tr>
-              <td><strong>Plastic Industry</strong></td>
-              <td><span class="badge badge-plastic">Plastic</span></td>
-              <td>250 kg</td>
-              <td><span class="location-dot">Faridabad</span></td>
-              <td style="color:var(--muted)">15 Mar</td>
-            </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
@@ -459,96 +775,130 @@
 </div><!-- /layout -->
 
 <script>
-  Chart.defaults.color = '#7d8590';
-  Chart.defaults.font.family = "'DM Sans', sans-serif";
+  // Date
+  document.getElementById('liveDate').textContent = new Date().toLocaleDateString('en-IN', {
+    weekday:'long', day:'numeric', month:'long', year:'numeric'
+  });
 
-  const grid = { color: 'rgba(48,54,61,0.6)' };
-  const commonScales = {
-    x: { grid, ticks: { color: '#7d8590' } },
-    y: { grid, ticks: { color: '#7d8590' } }
-  };
+  const wasteLabels  = JSON.parse('{{ waste_labels|escapejs }}');
+  const wasteValues  = JSON.parse('{{ waste_values|escapejs }}');
 
-  // TOP COMPANIES BAR
-  new Chart(document.getElementById("topCompanies"), {
-    type: "bar",
+  const months       = JSON.parse('{{ months|escapejs }}');
+  const monthlyData  = JSON.parse('{{ quantities|escapejs }}');
+  const companyNames = JSON.parse('{{ company_names|escapejs }}');
+  const companyWaste = JSON.parse('{{ company_waste|escapejs }}');
+
+  // Chart defaults — match warm light theme
+  Chart.defaults.font.family = "'Outfit', sans-serif";
+  Chart.defaults.font.size   = 11;
+  Chart.defaults.color       = '#9a9590';
+
+  const grid = 'rgba(204,200,192,0.5)';
+  const tick  = '#9a9590';
+
+  const PALETTE = ['#2a6049','#2c4f8a','#c47c2b','#5c3d8a','#3d4a5c','#4f9e84'];
+  const PALETTE_LT = ['rgba(42,96,73,0.7)','rgba(44,79,138,0.7)','rgba(196,124,43,0.7)','rgba(92,61,138,0.7)','rgba(61,74,92,0.7)','rgba(79,158,132,0.7)'];
+
+  // ── TOP COMPANIES BAR ───
+  new Chart(document.getElementById('topCompanies'), {
+    type: 'bar',
     data: {
-      labels: ["CocaCola", "Amazon", "Nestle", "Pepsi", "Unilever"],
+      labels: companyNames,
       datasets: [{
-        label: "Waste Produced (kg)",
-        data: [500, 420, 350, 300, 250],
-        backgroundColor: [
-          "rgba(63,185,80,0.85)",
-          "rgba(63,185,80,0.70)",
-          "rgba(63,185,80,0.55)",
-          "rgba(63,185,80,0.40)",
-          "rgba(63,185,80,0.28)"
-        ],
-        borderRadius: 6,
-        borderSkipped: false
+        data: companyWaste,
+        backgroundColor: companyNames.map((_,i) => PALETTE_LT[i % PALETTE_LT.length]),
+        borderColor: companyNames.map((_,i) => PALETTE[i % PALETTE.length]),
+        borderWidth: 1.5,
+        borderRadius: 8,
+        borderSkipped: false,
       }]
     },
     options: {
+      responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
-      scales: commonScales
+      scales: {
+        x: { grid: { color: grid }, ticks: { color: tick } },
+        y: { grid: { color: grid }, ticks: { color: tick } }
+      }
     }
   });
 
-  // PIE — AVAILABLE WASTE
-  new Chart(document.getElementById("availableWaste"), {
-    type: "pie",
+  // ── MONTHLY TREND LINE ───
+  new Chart(document.getElementById('monthlyTrend'), {
+    type: 'line',
     data: {
-      labels: ["Plastic", "Paper", "Metal", "Organic"],
+      labels: months,
       datasets: [{
-        data: [40, 25, 20, 15],
-        backgroundColor: ["#f85149", "#58a6ff", "#e3b341", "#3fb950"],
-        borderColor: "#161b22",
-        borderWidth: 3
-      }]
-    },
-    options: {
-      plugins: { legend: { position: 'bottom', labels: { padding: 16, boxWidth: 12 } } }
-    }
-  });
-
-  // LINE — MONTHLY TREND
-  new Chart(document.getElementById("monthlyTrend"), {
-    type: "line",
-    data: {
-      labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-      datasets: [{
-        label: "Waste Produced",
-        data: [200, 300, 450, 400, 550, 700],
-        borderColor: "#3fb950",
-        backgroundColor: "rgba(63,185,80,0.08)",
-        pointBackgroundColor: "#3fb950",
-        pointRadius: 5,
-        pointHoverRadius: 7,
+        data: monthlyData,
+        borderColor: '#2c4f8a',
+        backgroundColor: 'rgba(44,79,138,0.07)',
+        borderWidth: 2,
         fill: true,
-        tension: 0.4
+        tension: 0.4,
+        pointBackgroundColor: '#2c4f8a',
+        pointBorderColor: 'rgba(255,255,255,0.9)',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
       }]
     },
     options: {
+      responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
-      scales: commonScales
+      scales: {
+        x: { grid: { color: grid }, ticks: { color: tick, maxTicksLimit: 6 } },
+        y: { grid: { color: grid }, ticks: { color: tick } }
+      }
     }
   });
 
-  // DOUGHNUT — WASTE TYPE
-  new Chart(document.getElementById("wasteType"), {
-    type: "doughnut",
+  // ── DOUGHNUT ───
+  new Chart(document.getElementById('availableWaste'), {
+    type: 'doughnut',
     data: {
-      labels: ["Plastic", "Paper", "Metal", "Organic"],
+      labels: wasteLabels,
       datasets: [{
-        data: [35, 30, 20, 15],
-        backgroundColor: ["#f85149", "#58a6ff", "#e3b341", "#3fb950"],
-        borderColor: "#161b22",
+        data: wasteValues,
+        backgroundColor: PALETTE_LT,
+        borderColor: '#f0ede8',
         borderWidth: 3,
-        hoverOffset: 8
+        hoverOffset: 10,
       }]
     },
     options: {
-      cutout: "68%",
-      plugins: { legend: { position: 'bottom', labels: { padding: 16, boxWidth: 12 } } }
+      responsive: true, maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: tick, padding: 12, boxWidth: 10, font: { size: 10 } }
+        }
+      }
+    }
+  });
+
+  // ── DISTRIBUTION BAR ───
+  new Chart(document.getElementById('wasteDistribution'), {
+    type: 'bar',
+    data: {
+      labels: wasteLabels,
+      datasets: [{
+        label: 'kg',
+        data: wasteValues,
+        backgroundColor: 'rgba(196,124,43,0.65)',
+        borderColor: '#c47c2b',
+        borderWidth: 1.5,
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: grid }, ticks: { color: tick } },
+        y: { grid: { color: grid }, ticks: { color: tick } }
+      }
     }
   });
 </script>

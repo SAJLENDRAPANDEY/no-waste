@@ -1,0 +1,1 @@
+web: gunicorn wastenot_project.wsgi

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>WasteMatch — AI Matching Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #ffffff;
+  --bg2: #f7f8f5;
+  --bg3: #f0f2ec;
+  --card: #ffffff;
+  --card2: #f7f8f5;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --green: #2a7a3b;
+  --green2: #236632;
+  --green3: #1c5229;
+  --green-dim: rgba(42,122,59,0.08);
+  --green-dim2: rgba(42,122,59,0.15);
+  --text: #111410;
+  --text2: #5a6355;
+  --text3: #9aa393;
+  --amber: #b87000;
+  --blue: #1a6fa8;
+  --red: #c0392b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* Grid background */
+body::before{
+  content:'';
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background-image:
+    linear-gradient(rgba(42,122,59,0.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(42,122,59,0.05) 1px,transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+  z-index:0;
+}
+
+.page{
+  position:relative;z-index:1;
+  max-width:820px;
+  margin:0 auto;
+  padding:3rem 1.5rem 4rem;
+}
+
+/* ── HEADER ── */
+.header{margin-bottom:3rem}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--green);
+  margin-bottom:1.25rem;
+}
+.eyebrow-line{width:28px;height:1px;background:var(--green);opacity:.6}
+.live-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 8px var(--green);
+  animation:livepulse 2s ease-in-out infinite;
+}
+@keyframes livepulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--green)}50%{opacity:.4;box-shadow:0 0 2px var(--green)}}
+h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(2rem,5vw,3.2rem);
+  font-weight:800;
+  color:var(--text);
+  line-height:1.1;
+  letter-spacing:-.02em;
+  margin-bottom:.75rem;
+}
+h1 span{color:var(--green)}
+.sub{
+  font-size:15px;font-weight:300;
+  color:var(--text2);
+  line-height:1.65;
+  max-width:520px;
+}
+
+/* ── STATS ── */
+.stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;
+  background:var(--border);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  margin-bottom:2rem;
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);
+}
+.stat{
+  background:var(--card);
+  padding:1.1rem 1.25rem;
+  position:relative;
+}
+.stat::after{
+  content:'';
+  position:absolute;bottom:0;left:1.25rem;right:1.25rem;
+  height:2px;background:var(--green);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .4s ease;
+  opacity:.5;
+}
+.stat:hover::after{transform:scaleX(1)}
+.stat-n{
+  font-family:'Syne',sans-serif;
+  font-size:1.6rem;font-weight:700;
+  color:var(--green);
+  line-height:1;
+  margin-bottom:4px;
+}
+.stat-l{font-size:11px;color:var(--text3);letter-spacing:.04em;text-transform:uppercase}
+
+/* ── FORM CARD ── */
+.form-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:1.75rem;
+  margin-bottom:1.5rem;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 1px 6px rgba(0,0,0,0.06);
+}
+.form-card::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--green),transparent);
+  opacity:.3;
+}
+.form-title{
+  font-family:'Syne',sans-serif;
+  font-size:13px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:1.25rem;
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.field{}
+.field label{
+  display:block;
+  font-size:11px;font-weight:500;
+  color:var(--text3);
+  letter-spacing:.06em;text-transform:uppercase;
+  margin-bottom:7px;
+}
+.field select,.field input{
+  width:100%;height:44px;
+  padding:0 14px;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:10px;
+  color:var(--text);
+  font-size:13px;font-family:'DM Sans',sans-serif;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+  -webkit-appearance:none;
+  appearance:none;
+}
+.field select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a5f56' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  padding-right:32px;
+}
+.field select:focus,.field input:focus{
+  border-color:var(--green);
+  background:var(--card2);
+  box-shadow:0 0 0 3px rgba(90,255,110,.08);
+}
+.field input::placeholder{color:var(--text3)}
+
+/* Submit button */
+.submit-btn{
+  width:100%;height:48px;
+  background:var(--green);
+  color:#ffffff;
+  border:none;border-radius:10px;
+  font-family:'Syne',sans-serif;
+  font-size:14px;font-weight:700;
+  letter-spacing:.04em;text-transform:uppercase;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:background .15s,transform .1s,box-shadow .15s;
+  position:relative;overflow:hidden;
+}
+.submit-btn::before{
+  content:'';
+  position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+  transition:left .4s ease;
+}
+.submit-btn:hover{background:var(--green2);box-shadow:0 0 24px rgba(90,255,110,.25)}
+.submit-btn:hover::before{left:100%}
+.submit-btn:active{transform:scale(.98)}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+.spin{
+  width:16px;height:16px;
+  border:2px solid rgba(255,255,255,.3);
+  border-top-color:#ffffff;
+  border-radius:50%;
+  animation:spin .65s linear infinite;
+  display:none;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Error */
+.err-msg{
+  margin-top:12px;
+  background:rgba(255,107,107,.1);
+  border:1px solid rgba(255,107,107,.2);
+  color:var(--red);
+  border-radius:8px;
+  padding:10px 14px;
+  font-size:13px;
+  display:none;
+}
+
+/* ── RESULTS ── */
+.results-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:2rem 0 1rem;
+}
+.results-title{
+  font-family:'Syne',sans-serif;
+  font-size:13px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text3);
+  display:flex;align-items:center;gap:8px;
+}
+.results-title::before{content:'';width:3px;height:14px;background:var(--green);border-radius:2px}
+.count-badge{
+  background:var(--green-dim);
+  color:var(--green);
+  border:1px solid rgba(90,255,110,.2);
+  font-size:11px;font-weight:500;
+  padding:3px 10px;border-radius:20px;
+}
+
+/* Filter tags */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem}
+.ftag{
+  font-size:12px;font-family:'DM Sans',sans-serif;
+  padding:5px 14px;
+  border-radius:20px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--text2);
+  cursor:pointer;
+  transition:all .15s;
+  letter-spacing:.02em;
+}
+.ftag:hover{border-color:var(--border2);color:var(--text)}
+.ftag.on{
+  background:var(--green-dim);
+  border-color:rgba(90,255,110,.3);
+  color:var(--green);
+}
+
+/* Result card */
+.rc{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:1.1rem 1.25rem;
+  margin-bottom:10px;
+  display:flex;align-items:center;gap:16px;
+  animation:slideup .35s ease both;
+  transition:border-color .2s,background .2s;
+  cursor:default;
+}
+.rc:hover{border-color:var(--border2);background:var(--card2)}
+@keyframes slideup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.rank{
+  font-family:'Syne',sans-serif;
+  font-size:11px;font-weight:700;
+  color:var(--text3);
+  min-width:22px;
+  letter-spacing:.04em;
+}
+.rank.gold{color:var(--amber)}
+.avatar{
+  width:40px;height:40px;
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;
+  font-size:12px;font-weight:700;
+  flex-shrink:0;
+  letter-spacing:.02em;
+}
+.rinfo{flex:1;min-width:0}
+.rname{
+  font-family:'Syne',sans-serif;
+  font-size:14px;font-weight:600;
+  color:var(--text);
+  display:flex;align-items:center;gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:4px;
+}
+.rmeta{
+  font-size:12px;color:var(--text2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-weight:300;
+}
+.badge{
+  font-size:10px;font-weight:500;
+  padding:2px 9px;border-radius:20px;
+  letter-spacing:.03em;
+  font-family:'DM Sans',sans-serif;
+}
+.badge-top{background:rgba(42,122,59,.1);color:#1c5229;border:1px solid rgba(42,122,59,.2)}
+.badge-good{background:rgba(26,111,168,.1);color:#0e4d7a;border:1px solid rgba(26,111,168,.2)}
+.badge-pos{background:rgba(184,112,0,.08);color:#7a4a00;border:1px solid rgba(184,112,0,.2)}
+
+.score-col{text-align:right;flex-shrink:0;min-width:72px}
+.score-num{
+  font-family:'Syne',sans-serif;
+  font-size:20px;font-weight:800;
+  line-height:1;
+}
+.score-pct{font-size:12px;font-weight:400;color:var(--text3)}
+.score-word{font-size:10px;color:var(--text3);letter-spacing:.05em;text-transform:uppercase;margin-top:2px}
+.bar-track{
+  width:64px;height:3px;
+  background:var(--border);
+  border-radius:2px;
+  margin:5px 0 0 auto;
+}
+.bar-fill{height:100%;border-radius:2px;transition:width .5s ease}
+
+/* Empty */
+.empty-state{
+  text-align:center;
+  padding:4rem 2rem;
+}
+.empty-icon{
+  width:56px;height:56px;
+  border-radius:14px;
+  background:var(--card);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1.25rem;
+}
+.empty-icon svg{width:22px;height:22px;stroke:var(--text3);fill:none;stroke-width:1.5;stroke-linecap:round}
+.empty-h{
+  font-family:'Syne',sans-serif;
+  font-size:16px;font-weight:600;
+  color:var(--text2);
+  margin-bottom:6px;
+}
+.empty-p{font-size:13px;color:var(--text3);font-weight:300}
+
+/* Hidden */
+.hidden{display:none!important}
+
+/* Responsive */
+@media(max-width:520px){
+  .grid2{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr}
+  .stat-n{font-size:1.3rem}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="eyebrow">
+      <div class="live-dot"></div>
+      <div class="eyebrow-line"></div>
+      AI Waste Matching
+    </div>
+    <h1>Match your waste.<br><span>Instantly.</span></h1>
+    <p class="sub">Connect surplus waste streams with certified recyclers and processors — AI-matched by type, quantity, location, and urgency.</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-n" id="s1">1,240+</div>
+      <div class="stat-l">Processors</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" id="s2">98%</div>
+      <div class="stat-l">Match Accuracy</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" id="s3">4.2h</div>
+      <div class="stat-l">Avg. Pickup</div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="form-card">
+    <div class="form-title">Waste Details</div>
+    <div class="grid2">
+      <div class="field">
+        <label>Waste Type</label>
+        <select id="wt">
+          <option value="">Select category…</option>
+          <option>Plastic (PET)</option>
+          <option>Plastic (HDPE)</option>
+          <option>Cardboard / Paper</option>
+          <option>Ferrous Metal</option>
+          <option>Non-Ferrous Metal</option>
+          <option>Glass</option>
+          <option>Electronic Waste</option>
+          <option>Organic / Food Waste</option>
+          <option>Textile</option>
+          <option>Construction Debris</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Quantity (kg)</label>
+        <input type="number" id="qty" placeholder="e.g. 500" min="1"/>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>Location</label>
+        <input type="text" id="loc" placeholder="City or PIN code"/>
+      </div>
+      <div class="field">
+        <label>Urgency</label>
+        <select id="urg">
+          <option value="">Any timeline</option>
+          <option>Within 24 hrs</option>
+          <option>Within a week</option>
+          <option>Within a month</option>
+          <option>Flexible</option>
+        </select>
+      </div>
+    </div>
+    <button class="submit-btn" id="mbtn" onclick="run()">
+      <div class="spin" id="sp"></div>
+      <span id="btext">Find Best Matches</span>
+    </button>
+    <div class="err-msg" id="err"></div>
+  </div>
+
+  <!-- Results section -->
+  <div id="resSection" class="hidden">
+    <div class="results-header">
+      <div class="results-title">
+        Top Matches
+        <span class="count-badge" id="cnt"></span>
+      </div>
+    </div>
+    <div class="filters" id="filters">
+      <span class="ftag on" onclick="doFilter(this,'all')">All results</span>
+      <span class="ftag" onclick="doFilter(this,'top')">Top picks</span>
+      <span class="ftag" onclick="doFilter(this,'near')">Nearby first</span>
+      <span class="ftag" onclick="doFilter(this,'bulk')">High capacity</span>
+    </div>
+    <div id="rlist"></div>
+  </div>
+
+  <!-- Empty state -->
+  <div id="empty" class="empty-state">
+    <div class="empty-icon">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+    </div>
+    <div class="empty-h">No matches yet</div>
+    <p class="empty-p">Enter your waste details above and run the matching engine</p>
+  </div>
+
+</div>
+
+<script>
+const DATA = [
+  {company:"GreenLoop Recyclers",loc:"Delhi NCR",qty:1200,score:97,tag:"Certified · High volume",av:"GL",bg:"rgba(42,122,59,.1)",tc:"#1c5229",bar:"#2a7a3b",tier:"top"},
+  {company:"EcoResolve Ltd.",loc:"Gurugram",qty:800,score:91,tag:"Nearby · Fast pickup",av:"ER",bg:"rgba(26,111,168,.1)",tc:"#0e4d7a",bar:"#1a6fa8",tier:"top"},
+  {company:"CleanCycle Hub",loc:"Faridabad",qty:600,score:84,tag:"Flexible schedule",av:"CC",bg:"rgba(120,80,200,.1)",tc:"#5a3a9a",bar:"#7850c8",tier:"good"},
+  {company:"RecoveX Industries",loc:"Noida",qty:2000,score:76,tag:"Bulk specialist",av:"RI",bg:"rgba(184,112,0,.08)",tc:"#7a4a00",bar:"#b87000",tier:"good"},
+  {company:"PrimeMatter Co.",loc:"Greater Noida",qty:300,score:63,tag:"Small batch OK",av:"PM",bg:"rgba(192,57,43,.08)",tc:"#8b1a10",bar:"#c0392b",tier:"possible"}
+];
+let all=[];
+
+function run(){
+  const wt=document.getElementById('wt').value;
+  const qty=document.getElementById('qty').value;
+  const err=document.getElementById('err');
+  if(!wt||!qty){
+    err.textContent='Please select a waste type and enter a quantity.';
+    err.style.display='block';return;
+  }
+  err.style.display='none';
+  const btn=document.getElementById('mbtn');
+  document.getElementById('sp').style.display='block';
+  document.getElementById('btext').textContent='Matching…';
+  btn.disabled=true;
+  document.getElementById('empty').classList.add('hidden');
+  document.getElementById('resSection').classList.add('hidden');
+
+  setTimeout(()=>{
+    document.getElementById('sp').style.display='none';
+    document.getElementById('btext').textContent='Find Best Matches';
+    btn.disabled=false;
+    all=[...DATA].sort((a,b)=>b.score-a.score);
+    document.querySelectorAll('.ftag').forEach(t=>t.classList.remove('on'));
+    document.querySelector('.ftag').classList.add('on');
+    renderList(all);
+  },1100);
+}
+
+function doFilter(el,type){
+  document.querySelectorAll('.ftag').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  let d=[...all];
+  if(type==='top') d=d.filter(r=>r.tier==='top');
+  else if(type==='near') d=[...d].sort((a,b)=>a.loc.localeCompare(b.loc));
+  else if(type==='bulk') d=[...d].sort((a,b)=>b.qty-a.qty);
+  renderList(d);
+}
+
+function renderList(data){
+  const list=document.getElementById('rlist');
+  list.innerHTML='';
+  document.getElementById('cnt').textContent=data.length+' found';
+  if(!data.length){
+    list.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px;">No matches for this filter</div>';
+    document.getElementById('resSection').classList.remove('hidden');return;
+  }
+  data.forEach((r,i)=>{
+    const sc=r.score>=90?'var(--green)':r.score>=75?'var(--blue)':'var(--amber)';
+    const badgeClass=r.tier==='top'?'badge-top':r.tier==='good'?'badge-good':'badge-pos';
+    const lbl=r.score>=90?'Top pick':r.score>=75?'Good fit':'Possible';
+    const d=document.createElement('div');
+    d.className='rc';
+    d.style.animationDelay=(i*.07)+'s';
+    const isGold=i===0;
+    d.innerHTML=`
+      <div class="rank${isGold?' gold':''}">${isGold?'★':'#'+(i+1)}</div>
+      <div class="avatar" style="background:${r.bg};color:${r.tc}">${r.av}</div>
+      <div class="rinfo">
+        <div class="rname">${r.company}<span class="badge ${badgeClass}">${lbl}</span></div>
+        <div class="rmeta">${r.loc}&nbsp;·&nbsp;${r.qty.toLocaleString()} kg available&nbsp;·&nbsp;${r.tag}</div>
+      </div>
+      <div class="score-col">
+        <div class="score-num" style="color:${sc}">${r.score}<span class="score-pct">%</span></div>
+        <div class="score-word">match</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${r.score}%;background:${r.bar}"></div></div>
+      </div>`;
+    list.appendChild(d);
+  });
+  document.getElementById('resSection').classList.remove('hidden');
+}
+</script>
+</body>
+</html>

@@ -1,14 +1,30 @@
 from django.urls import path
 from . import views
+from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
 
-    path('', views.dashboard, name="dashboard"),
+    # ── Public ──────────────────────────────
+    path('',           views.landing,     name="landing"),
+    path('dashboard/', views.dashboard,   name="dashboard"),
+    path('login/',     views.login_view,  name="login"),       # ✅ custom login view
+    path('signup/',    views.signup,      name="signup"),
+    path('logout/',    LogoutView.as_view(next_page='login'), name='logout'),
 
-    path('producer/', views.producer_page, name="producer_page"),
+    # ── Producer ────────────────────────────
+    path('producer/',  views.producer_page,   name="producer_page"),
+    path('add-waste/', views.add_waste,       name="add_waste"),
+    path('approve/<int:id>/', views.approve_request, name="approve_request"),
+    path('reject/<int:id>/',  views.reject_request,  name="reject_request"),
 
-    path('consumer/', views.consumer_page, name="consumer_page"),
+    # ── Consumer ────────────────────────────
+    path('consumer/',         views.consumer_page,  name="consumer_page"),
+    path('request/<int:id>/', views.request_waste,  name="request"),
+    path('add-request/',      views.add_requirement, name="add_requirement"),
 
-    path('request/<int:id>/', views.request_waste, name="request"),
+    # ── Common ──────────────────────────────
+    path('profile/', views.profile, name='profile'),
 
+    # path("smart-match/", views.smart_match_page, name="smart_match_page"),
+    path("smart-match/", views.smart_match_api, name="smart_match_api"),
 ]
