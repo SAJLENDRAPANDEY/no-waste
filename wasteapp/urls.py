@@ -30,4 +30,5 @@ urlpatterns = [
     path('smart-match/', views.smart_match_page),
     path('api/smart-match/', views.smart_match_api),
     path('request/', views.request_page, name='request_page'), 
+    path("about/", views.about, name="about"),
 ]

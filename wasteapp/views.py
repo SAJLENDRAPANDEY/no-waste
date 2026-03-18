@@ -594,3 +594,6 @@ def smart_match_page(request):
 
 def request_page(request):
     return render(request, 'request.html')
+
+def about(request):
+    return render(request, "about.html")
