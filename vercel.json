@@ -1,14 +1,7 @@
 {
-  "builds": [
-    {
-      "src": "wastenot_project/wsgi.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "wastenot_project/wsgi.py"
-    }
-  ]
+  "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput",
+  "outputDirectory": "staticfiles",
+  "env": {
+    "PYTHONUNBUFFERED": "1"
+  }
 }
