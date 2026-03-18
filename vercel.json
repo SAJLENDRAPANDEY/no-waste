@@ -1,7 +1,15 @@
 {
-  "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput",
-  "outputDirectory": "staticfiles",
-  "env": {
-    "PYTHONUNBUFFERED": "1"
-  }
+  "version": 2,
+  "builds": [
+    {
+      "src": "vercel.py",
+      "use": "@vercel/python@2.15.0"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "vercel.py"
+    }
+  ]
 }
