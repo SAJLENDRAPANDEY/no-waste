@@ -26,5 +26,8 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
 
     # path("smart-match/", views.smart_match_page, name="smart_match_page"),
-    path("smart-match/", views.smart_match_api, name="smart_match_api"),
+    # path("api/smart-match/", views.smart_match_api, name="smart_match"),
+    path('smart-match/', views.smart_match_page),
+    path('api/smart-match/', views.smart_match_api),
+    path('request/', views.request_page, name='request_page'), 
 ]

@@ -3,560 +3,1051 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>WasteMatch — AI Matching Engine</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<title>WasteMatch — Smart Recycling Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --bg: #ffffff;
-  --bg2: #f7f8f5;
-  --bg3: #f0f2ec;
-  --card: #ffffff;
-  --card2: #f7f8f5;
-  --border: rgba(0,0,0,0.08);
-  --border2: rgba(0,0,0,0.14);
-  --green: #2a7a3b;
-  --green2: #236632;
-  --green3: #1c5229;
-  --green-dim: rgba(42,122,59,0.08);
-  --green-dim2: rgba(42,122,59,0.15);
-  --text: #111410;
-  --text2: #5a6355;
-  --text3: #9aa393;
-  --amber: #b87000;
-  --blue: #1a6fa8;
-  --red: #c0392b;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  font-family:'DM Sans',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  min-height:100vh;
-  overflow-x:hidden;
+  --white: #ffffff;
+  --off: #fafaf9;
+  --bg: #f4f4f2;
+  --border: #e5e5e2;
+  --border2: #d0d0cc;
+  --text: #1a1a18;
+  --text2: #6b6b66;
+  --text3: #a8a8a2;
+  --green: #1a6b3a;
+  --green-light: #e8f4ed;
+  --green-mid: #2d8a50;
+  --green-pale: #f0f8f3;
+  --accent: #3ecf6e;
+  --amber: #92610a;
+  --amber-bg: #fef8ec;
+  --blue: #1554a0;
+  --blue-bg: #eff4ff;
+  --red: #be3a2b;
+  --red-bg: #fff1ef;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
 }
 
-/* Grid background */
-body::before{
-  content:'';
-  position:fixed;top:0;left:0;right:0;bottom:0;
-  background-image:
-    linear-gradient(rgba(42,122,59,0.05) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(42,122,59,0.05) 1px,transparent 1px);
-  background-size:40px 40px;
-  pointer-events:none;
-  z-index:0;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Geist', sans-serif;
+  background: var(--white);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
-.page{
-  position:relative;z-index:1;
-  max-width:820px;
-  margin:0 auto;
-  padding:3rem 1.5rem 4rem;
+/* ─── TOPBAR ─── */
+.topbar {
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  background: var(--white);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.logo-icon {
+  width: 30px; height: 30px;
+  background: var(--green);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.logo-icon svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.logo-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--green-light);
+  color: var(--green);
+  border: 1px solid rgba(26,107,58,0.15);
+}
+.dot-live {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
-/* ── HEADER ── */
-.header{margin-bottom:3rem}
-.eyebrow{
-  display:inline-flex;align-items:center;gap:8px;
-  font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--green);
-  margin-bottom:1.25rem;
-}
-.eyebrow-line{width:28px;height:1px;background:var(--green);opacity:.6}
-.live-dot{
-  width:7px;height:7px;border-radius:50%;background:var(--green);
-  box-shadow:0 0 8px var(--green);
-  animation:livepulse 2s ease-in-out infinite;
-}
-@keyframes livepulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--green)}50%{opacity:.4;box-shadow:0 0 2px var(--green)}}
-h1{
-  font-family:'Syne',sans-serif;
-  font-size:clamp(2rem,5vw,3.2rem);
-  font-weight:800;
-  color:var(--text);
-  line-height:1.1;
-  letter-spacing:-.02em;
-  margin-bottom:.75rem;
-}
-h1 span{color:var(--green)}
-.sub{
-  font-size:15px;font-weight:300;
-  color:var(--text2);
-  line-height:1.65;
-  max-width:520px;
+/* ─── LAYOUT ─── */
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 3.5rem 2rem 5rem;
 }
 
-/* ── STATS ── */
-.stats{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:1px;
-  background:var(--border);
-  border:1px solid var(--border);
-  border-radius:12px;
-  overflow:hidden;
-  margin-bottom:2rem;
-  box-shadow:0 1px 4px rgba(0,0,0,0.06);
+/* ─── HERO ─── */
+.hero { margin-bottom: 3rem; }
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 1.1rem;
 }
-.stat{
-  background:var(--card);
-  padding:1.1rem 1.25rem;
-  position:relative;
+.hero-tag::before {
+  content: '';
+  display: block;
+  width: 20px; height: 1px;
+  background: var(--green);
+  opacity: 0.5;
 }
-.stat::after{
-  content:'';
-  position:absolute;bottom:0;left:1.25rem;right:1.25rem;
-  height:2px;background:var(--green);
-  transform:scaleX(0);transform-origin:left;
-  transition:transform .4s ease;
-  opacity:.5;
+h1 {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
 }
-.stat:hover::after{transform:scaleX(1)}
-.stat-n{
-  font-family:'Syne',sans-serif;
-  font-size:1.6rem;font-weight:700;
-  color:var(--green);
-  line-height:1;
-  margin-bottom:4px;
+h1 em {
+  font-style: italic;
+  color: var(--green);
 }
-.stat-l{font-size:11px;color:var(--text3);letter-spacing:.04em;text-transform:uppercase}
-
-/* ── FORM CARD ── */
-.form-card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:1.75rem;
-  margin-bottom:1.5rem;
-  position:relative;
-  overflow:hidden;
-  box-shadow:0 1px 6px rgba(0,0,0,0.06);
-}
-.form-card::before{
-  content:'';
-  position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,var(--green),transparent);
-  opacity:.3;
-}
-.form-title{
-  font-family:'Syne',sans-serif;
-  font-size:13px;font-weight:600;
-  letter-spacing:.08em;text-transform:uppercase;
-  color:var(--text3);
-  margin-bottom:1.25rem;
-}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.field{}
-.field label{
-  display:block;
-  font-size:11px;font-weight:500;
-  color:var(--text3);
-  letter-spacing:.06em;text-transform:uppercase;
-  margin-bottom:7px;
-}
-.field select,.field input{
-  width:100%;height:44px;
-  padding:0 14px;
-  background:var(--bg3);
-  border:1px solid var(--border);
-  border-radius:10px;
-  color:var(--text);
-  font-size:13px;font-family:'DM Sans',sans-serif;
-  outline:none;
-  transition:border-color .2s,box-shadow .2s,background .2s;
-  -webkit-appearance:none;
-  appearance:none;
-}
-.field select{
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a5f56' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right 12px center;
-  padding-right:32px;
-}
-.field select:focus,.field input:focus{
-  border-color:var(--green);
-  background:var(--card2);
-  box-shadow:0 0 0 3px rgba(90,255,110,.08);
-}
-.field input::placeholder{color:var(--text3)}
-
-/* Submit button */
-.submit-btn{
-  width:100%;height:48px;
-  background:var(--green);
-  color:#ffffff;
-  border:none;border-radius:10px;
-  font-family:'Syne',sans-serif;
-  font-size:14px;font-weight:700;
-  letter-spacing:.04em;text-transform:uppercase;
-  cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  transition:background .15s,transform .1s,box-shadow .15s;
-  position:relative;overflow:hidden;
-}
-.submit-btn::before{
-  content:'';
-  position:absolute;top:0;left:-100%;width:100%;height:100%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
-  transition:left .4s ease;
-}
-.submit-btn:hover{background:var(--green2);box-shadow:0 0 24px rgba(90,255,110,.25)}
-.submit-btn:hover::before{left:100%}
-.submit-btn:active{transform:scale(.98)}
-.submit-btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
-.spin{
-  width:16px;height:16px;
-  border:2px solid rgba(255,255,255,.3);
-  border-top-color:#ffffff;
-  border-radius:50%;
-  animation:spin .65s linear infinite;
-  display:none;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* Error */
-.err-msg{
-  margin-top:12px;
-  background:rgba(255,107,107,.1);
-  border:1px solid rgba(255,107,107,.2);
-  color:var(--red);
-  border-radius:8px;
-  padding:10px 14px;
-  font-size:13px;
-  display:none;
+.hero-sub {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--text2);
+  line-height: 1.65;
+  max-width: 500px;
 }
 
-/* ── RESULTS ── */
-.results-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin:2rem 0 1rem;
+/* ─── METRICS ─── */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 2.5rem;
 }
-.results-title{
-  font-family:'Syne',sans-serif;
-  font-size:13px;font-weight:600;
-  letter-spacing:.08em;text-transform:uppercase;
-  color:var(--text3);
-  display:flex;align-items:center;gap:8px;
+.metric {
+  background: var(--white);
+  padding: 1.25rem 1.4rem;
+  transition: background 0.15s;
 }
-.results-title::before{content:'';width:3px;height:14px;background:var(--green);border-radius:2px}
-.count-badge{
-  background:var(--green-dim);
-  color:var(--green);
-  border:1px solid rgba(90,255,110,.2);
-  font-size:11px;font-weight:500;
-  padding:3px 10px;border-radius:20px;
+.metric:hover { background: var(--off); }
+.metric-n {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--green);
+  line-height: 1;
+  margin-bottom: 5px;
 }
-
-/* Filter tags */
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem}
-.ftag{
-  font-size:12px;font-family:'DM Sans',sans-serif;
-  padding:5px 14px;
-  border-radius:20px;
-  border:1px solid var(--border);
-  background:transparent;
-  color:var(--text2);
-  cursor:pointer;
-  transition:all .15s;
-  letter-spacing:.02em;
-}
-.ftag:hover{border-color:var(--border2);color:var(--text)}
-.ftag.on{
-  background:var(--green-dim);
-  border-color:rgba(90,255,110,.3);
-  color:var(--green);
+.metric-l {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-/* Result card */
-.rc{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:1.1rem 1.25rem;
-  margin-bottom:10px;
-  display:flex;align-items:center;gap:16px;
-  animation:slideup .35s ease both;
-  transition:border-color .2s,background .2s;
-  cursor:default;
+/* ─── FORM ─── */
+.form-wrap {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
 }
-.rc:hover{border-color:var(--border2);background:var(--card2)}
-@keyframes slideup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.form-head {
+  padding: 1.4rem 1.6rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.form-head-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.form-head-title::before {
+  content: '';
+  width: 3px; height: 14px;
+  background: var(--green);
+  border-radius: 2px;
+  display: block;
+}
+.form-head-sub {
+  font-size: 12px;
+  color: var(--text3);
+}
+.form-body { padding: 1.6rem; }
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
 
-.rank{
-  font-family:'Syne',sans-serif;
-  font-size:11px;font-weight:700;
-  color:var(--text3);
-  min-width:22px;
-  letter-spacing:.04em;
+/* ─ category chips ─ */
+.cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
-.rank.gold{color:var(--amber)}
-.avatar{
-  width:40px;height:40px;
-  border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;
-  font-size:12px;font-weight:700;
-  flex-shrink:0;
-  letter-spacing:.02em;
+.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+  background: var(--white);
+  cursor: pointer;
+  transition: all 0.14s;
+  user-select: none;
 }
-.rinfo{flex:1;min-width:0}
-.rname{
-  font-family:'Syne',sans-serif;
-  font-size:14px;font-weight:600;
-  color:var(--text);
-  display:flex;align-items:center;gap:8px;
-  flex-wrap:wrap;
-  margin-bottom:4px;
+.cat-chip:hover { border-color: var(--border2); color: var(--text); }
+.cat-chip.active {
+  background: var(--green-light);
+  border-color: rgba(26,107,58,0.25);
+  color: var(--green);
 }
-.rmeta{
-  font-size:12px;color:var(--text2);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  font-weight:300;
-}
-.badge{
-  font-size:10px;font-weight:500;
-  padding:2px 9px;border-radius:20px;
-  letter-spacing:.03em;
-  font-family:'DM Sans',sans-serif;
-}
-.badge-top{background:rgba(42,122,59,.1);color:#1c5229;border:1px solid rgba(42,122,59,.2)}
-.badge-good{background:rgba(26,111,168,.1);color:#0e4d7a;border:1px solid rgba(26,111,168,.2)}
-.badge-pos{background:rgba(184,112,0,.08);color:#7a4a00;border:1px solid rgba(184,112,0,.2)}
+.cat-chip .chip-icon { font-size: 13px; }
 
-.score-col{text-align:right;flex-shrink:0;min-width:72px}
-.score-num{
-  font-family:'Syne',sans-serif;
-  font-size:20px;font-weight:800;
-  line-height:1;
+/* ─ inputs ─ */
+.field input, .field select {
+  height: 42px;
+  padding: 0 13px;
+  background: var(--off);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: 'Geist', sans-serif;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
 }
-.score-pct{font-size:12px;font-weight:400;color:var(--text3)}
-.score-word{font-size:10px;color:var(--text3);letter-spacing:.05em;text-transform:uppercase;margin-top:2px}
-.bar-track{
-  width:64px;height:3px;
-  background:var(--border);
-  border-radius:2px;
-  margin:5px 0 0 auto;
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b66' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-color: var(--off);
+  padding-right: 34px;
+  cursor: pointer;
 }
-.bar-fill{height:100%;border-radius:2px;transition:width .5s ease}
+.field input:focus, .field select:focus {
+  border-color: var(--green);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(26,107,58,0.08);
+}
+.field input::placeholder { color: var(--text3); }
 
-/* Empty */
-.empty-state{
-  text-align:center;
-  padding:4rem 2rem;
+/* ─ range slider ─ */
+.range-wrap { display: flex; flex-direction: column; gap: 6px; }
+.range-row { display: flex; align-items: center; gap: 10px; }
+.range-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green);
+  min-width: 65px;
+  text-align: right;
 }
-.empty-icon{
-  width:56px;height:56px;
-  border-radius:14px;
-  background:var(--card);
-  border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  margin:0 auto 1.25rem;
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
 }
-.empty-icon svg{width:22px;height:22px;stroke:var(--text3);fill:none;stroke-width:1.5;stroke-linecap:round}
-.empty-h{
-  font-family:'Syne',sans-serif;
-  font-size:16px;font-weight:600;
-  color:var(--text2);
-  margin-bottom:6px;
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--green);
+  border: 3px solid white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  transition: box-shadow 0.15s;
 }
-.empty-p{font-size:13px;color:var(--text3);font-weight:300}
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 4px rgba(26,107,58,0.12);
+}
 
-/* Hidden */
-.hidden{display:none!important}
+/* ─ submit ─ */
+.submit-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.submit-btn {
+  flex: 1;
+  height: 46px;
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Geist', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  letter-spacing: -0.01em;
+  position: relative;
+  overflow: hidden;
+}
+.submit-btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  transition: left 0.4s;
+}
+.submit-btn:hover { background: #155c30; box-shadow: 0 4px 16px rgba(26,107,58,0.3); }
+.submit-btn:hover::after { left: 100%; }
+.submit-btn:active { transform: scale(0.98); }
+.submit-btn:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+.reset-btn {
+  height: 46px;
+  padding: 0 16px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Geist', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.reset-btn:hover { border-color: var(--border2); color: var(--text); background: var(--off); }
+.spin {
+  width: 15px; height: 15px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-/* Responsive */
-@media(max-width:520px){
-  .grid2{grid-template-columns:1fr}
-  .stats{grid-template-columns:1fr}
-  .stat-n{font-size:1.3rem}
+/* ─ error ─ */
+.err-msg {
+  margin-top: 12px;
+  background: var(--red-bg);
+  border: 1px solid rgba(190,58,43,0.2);
+  color: var(--red);
+  border-radius: var(--radius-xs);
+  padding: 10px 14px;
+  font-size: 13px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─── RESULTS ─── */
+.results-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.results-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.count-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--green-light);
+  color: var(--green);
+  border: 1px solid rgba(26,107,58,0.15);
+}
+.sort-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--off);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 3px;
+}
+.sort-tab {
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.12s;
+  border: none;
+  background: transparent;
+  font-family: 'Geist', sans-serif;
+}
+.sort-tab:hover { color: var(--text); }
+.sort-tab.on {
+  background: var(--white);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ─── RESULT CARD ─── */
+.rc {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.4rem;
+  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 28px 52px 1fr auto;
+  align-items: center;
+  gap: 16px;
+  animation: fadeup 0.3s ease both;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  cursor: default;
+}
+.rc:hover {
+  border-color: var(--border2);
+  box-shadow: var(--shadow);
+}
+@keyframes fadeup {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.rc-rank {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text3);
+  text-align: center;
+  font-family: 'Instrument Serif', serif;
+}
+.rc-rank.gold { color: #c49a1a; font-size: 16px; }
+.rc-avatar {
+  width: 52px; height: 52px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  font-family: 'Geist', sans-serif;
+}
+.rc-info { min-width: 0; }
+.rc-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+  letter-spacing: -0.01em;
+}
+.rc-meta {
+  font-size: 12px;
+  color: var(--text2);
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.meta-sep { color: var(--border2); }
+.rc-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+.tag {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.02em;
+}
+.tag-green { background: var(--green-light); color: var(--green); border: 1px solid rgba(26,107,58,0.15); }
+.tag-blue  { background: var(--blue-bg);   color: var(--blue);  border: 1px solid rgba(21,84,160,0.15); }
+.tag-amber { background: var(--amber-bg);  color: var(--amber); border: 1px solid rgba(146,97,10,0.15); }
+
+/* score */
+.rc-score { text-align: right; flex-shrink: 0; min-width: 80px; }
+.score-ring {
+  position: relative;
+  width: 56px; height: 56px;
+  margin-left: auto;
+}
+.score-ring svg { transform: rotate(-90deg); }
+.score-ring-bg { fill: none; stroke: var(--border); stroke-width: 4; }
+.score-ring-fill { fill: none; stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.8s ease; }
+.score-ring-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1px;
+}
+.score-num {
+  font-family: 'Instrument Serif', serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1;
+}
+.score-pct { font-size: 9px; color: var(--text3); }
+
+/* ─── EMPTY ─── */
+.empty {
+  text-align: center;
+  padding: 5rem 2rem;
+}
+.empty-icon {
+  width: 60px; height: 60px;
+  border-radius: var(--radius);
+  background: var(--off);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+.empty-icon svg { width: 24px; height: 24px; stroke: var(--text3); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.empty-h {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.3rem;
+  color: var(--text2);
+  margin-bottom: 6px;
+}
+.empty-p { font-size: 13px; color: var(--text3); font-weight: 300; }
+
+/* ─── HIDDEN ─── */
+.hidden { display: none !important; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 640px) {
+  .topbar { padding: 0 1rem; }
+  .page { padding: 2rem 1rem 4rem; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid-2 { grid-template-columns: 1fr; }
+  .metrics { grid-template-columns: 1fr 1fr; }
+  .rc { grid-template-columns: 24px 44px 1fr auto; gap: 10px; }
+  .sort-tabs { display: none; }
 }
 </style>
 </head>
 <body>
+
+<!-- Topbar -->
+<nav class="topbar">
+  <a href="#" class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+    </div>
+    <span class="logo-text">WasteMatch</span>
+  </a>
+  <div class="topbar-right">
+    <span class="pill"><span class="dot-live"></span> Live Engine</span>
+  </div>
+</nav>
+
 <div class="page">
 
-  <!-- Header -->
-  <div class="header">
-    <div class="eyebrow">
-      <div class="live-dot"></div>
-      <div class="eyebrow-line"></div>
-      AI Waste Matching
-    </div>
-    <h1>Match your waste.<br><span>Instantly.</span></h1>
-    <p class="sub">Connect surplus waste streams with certified recyclers and processors — AI-matched by type, quantity, location, and urgency.</p>
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-tag">AI Matching Engine</div>
+    <h1>Match your waste.<br><em>Smartly.</em></h1>
+    <p class="hero-sub">Connect surplus waste streams with certified processors — matched by type, quantity, location, and urgency.</p>
   </div>
 
-  <!-- Stats -->
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-n" id="s1">1,240+</div>
-      <div class="stat-l">Processors</div>
-    </div>
-    <div class="stat">
-      <div class="stat-n" id="s2">98%</div>
-      <div class="stat-l">Match Accuracy</div>
-    </div>
-    <div class="stat">
-      <div class="stat-n" id="s3">4.2h</div>
-      <div class="stat-l">Avg. Pickup</div>
-    </div>
+  <!-- Metrics -->
+  <div class="metrics">
+    <div class="metric"><div class="metric-n">1,240+</div><div class="metric-l">Processors</div></div>
+    <div class="metric"><div class="metric-n">98%</div><div class="metric-l">Match Accuracy</div></div>
+    <div class="metric"><div class="metric-n">4.2h</div><div class="metric-l">Avg. Pickup</div></div>
+    <div class="metric"><div class="metric-n">32k+</div><div class="metric-l">Matches Made</div></div>
   </div>
 
   <!-- Form -->
-  <div class="form-card">
-    <div class="form-title">Waste Details</div>
-    <div class="grid2">
-      <div class="field">
-        <label>Waste Type</label>
-        <select id="wt">
-          <option value="">Select category…</option>
-          <option>Plastic (PET)</option>
-          <option>Plastic (HDPE)</option>
-          <option>Cardboard / Paper</option>
-          <option>Ferrous Metal</option>
-          <option>Non-Ferrous Metal</option>
-          <option>Glass</option>
-          <option>Electronic Waste</option>
-          <option>Organic / Food Waste</option>
-          <option>Textile</option>
-          <option>Construction Debris</option>
-        </select>
+  <div class="form-wrap">
+    <div class="form-head">
+      <div class="form-head-title">Waste Details</div>
+      <div class="form-head-sub">Fill in details to find the best matches</div>
+    </div>
+    <div class="form-body">
+
+      <!-- Waste type chips -->
+      <div class="field" style="margin-bottom:18px;">
+        <label>Waste Category</label>
+        <div class="cat-chips" id="chipGroup">
+          <span class="cat-chip" data-val="Plastic (PET)"       onclick="pickChip(this)"><span class="chip-icon">🧴</span> Plastic (PET)</span>
+          <span class="cat-chip" data-val="Plastic (HDPE)"      onclick="pickChip(this)"><span class="chip-icon">🪣</span> Plastic (HDPE)</span>
+          <span class="cat-chip" data-val="Plastic (PVC)"       onclick="pickChip(this)"><span class="chip-icon">🔧</span> Plastic (PVC)</span>
+          <span class="cat-chip" data-val="Plastic (PP)"        onclick="pickChip(this)"><span class="chip-icon">📦</span> Plastic (PP)</span>
+          <span class="cat-chip" data-val="Cardboard / Paper"   onclick="pickChip(this)"><span class="chip-icon">📄</span> Cardboard / Paper</span>
+          <span class="cat-chip" data-val="Glass"               onclick="pickChip(this)"><span class="chip-icon">🍾</span> Glass</span>
+          <span class="cat-chip" data-val="Ferrous Metal"       onclick="pickChip(this)"><span class="chip-icon">🔩</span> Ferrous Metal</span>
+          <span class="cat-chip" data-val="Non-Ferrous Metal"   onclick="pickChip(this)"><span class="chip-icon">🥫</span> Non-Ferrous Metal</span>
+          <span class="cat-chip" data-val="Electronic Waste"    onclick="pickChip(this)"><span class="chip-icon">💻</span> E-Waste</span>
+          <span class="cat-chip" data-val="Organic / Food Waste"onclick="pickChip(this)"><span class="chip-icon">🥬</span> Organic</span>
+          <span class="cat-chip" data-val="Textile"             onclick="pickChip(this)"><span class="chip-icon">👕</span> Textile</span>
+          <span class="cat-chip" data-val="Rubber / Tyres"      onclick="pickChip(this)"><span class="chip-icon">🔴</span> Rubber / Tyres</span>
+          <span class="cat-chip" data-val="Construction Debris" onclick="pickChip(this)"><span class="chip-icon">🏗️</span> Construction</span>
+          <span class="cat-chip" data-val="Hazardous Waste"     onclick="pickChip(this)"><span class="chip-icon">⚠️</span> Hazardous</span>
+          <span class="cat-chip" data-val="Wood / Timber"       onclick="pickChip(this)"><span class="chip-icon">🪵</span> Wood / Timber</span>
+          <span class="cat-chip" data-val="Chemical Waste"      onclick="pickChip(this)"><span class="chip-icon">🧪</span> Chemical</span>
+          <span class="cat-chip" data-val="Battery / Cells"     onclick="pickChip(this)"><span class="chip-icon">🔋</span> Battery</span>
+          <span class="cat-chip" data-val="Medical Waste"       onclick="pickChip(this)"><span class="chip-icon">🏥</span> Medical</span>
+        </div>
+        <!-- hidden real input -->
+        <input type="hidden" id="wt" name="waste_type"/>
       </div>
-      <div class="field">
-        <label>Quantity (kg)</label>
-        <input type="number" id="qty" placeholder="e.g. 500" min="1"/>
+
+      <div class="form-grid">
+        <!-- Quantity slider -->
+        <div class="range-wrap">
+          <label style="font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.07em;text-transform:uppercase;">Quantity (kg)</label>
+          <div class="range-row">
+            <input type="range" id="qtySlider" min="10" max="5000" step="10" value="500" oninput="syncQty(this.value)"/>
+            <div class="range-val" id="qtyVal">500 kg</div>
+          </div>
+          <input type="hidden" id="qty" name="quantity" value="500"/>
+        </div>
+
+        <div class="field">
+          <label>Location</label>
+          <input type="text" id="loc" name="location" placeholder="City or PIN code"/>
+        </div>
+
+        <div class="field">
+          <label>Urgency</label>
+          <select id="urg">
+            <option value="">Any timeline</option>
+            <option>Within 24 hrs</option>
+            <option>Within a week</option>
+            <option>Within a month</option>
+            <option>Flexible</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="submit-row">
+        <button class="submit-btn" id="mbtn" onclick="run()">
+          <div class="spin" id="sp"></div>
+          <span id="btext">Find Best Matches</span>
+        </button>
+        <button class="reset-btn" onclick="resetForm()">Reset</button>
+      </div>
+      <div class="err-msg" id="err">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="errText">Please select a waste type and enter a quantity.</span>
       </div>
     </div>
-    <div class="grid2">
-      <div class="field">
-        <label>Location</label>
-        <input type="text" id="loc" placeholder="City or PIN code"/>
-      </div>
-      <div class="field">
-        <label>Urgency</label>
-        <select id="urg">
-          <option value="">Any timeline</option>
-          <option>Within 24 hrs</option>
-          <option>Within a week</option>
-          <option>Within a month</option>
-          <option>Flexible</option>
-        </select>
-      </div>
-    </div>
-    <button class="submit-btn" id="mbtn" onclick="run()">
-      <div class="spin" id="sp"></div>
-      <span id="btext">Find Best Matches</span>
-    </button>
-    <div class="err-msg" id="err"></div>
   </div>
 
-  <!-- Results section -->
+  <!-- Results -->
   <div id="resSection" class="hidden">
-    <div class="results-header">
-      <div class="results-title">
+    <div class="results-bar">
+      <div class="results-label">
         Top Matches
-        <span class="count-badge" id="cnt"></span>
+        <span class="count-pill" id="cnt"></span>
       </div>
-    </div>
-    <div class="filters" id="filters">
-      <span class="ftag on" onclick="doFilter(this,'all')">All results</span>
-      <span class="ftag" onclick="doFilter(this,'top')">Top picks</span>
-      <span class="ftag" onclick="doFilter(this,'near')">Nearby first</span>
-      <span class="ftag" onclick="doFilter(this,'bulk')">High capacity</span>
+      <div class="sort-tabs">
+        <button class="sort-tab on" onclick="doFilter(this,'all')">All</button>
+        <button class="sort-tab" onclick="doFilter(this,'top')">Top Picks</button>
+        <button class="sort-tab" onclick="doFilter(this,'near')">Nearby</button>
+        <button class="sort-tab" onclick="doFilter(this,'bulk')">High Capacity</button>
+      </div>
     </div>
     <div id="rlist"></div>
   </div>
 
-  <!-- Empty state -->
-  <div id="empty" class="empty-state">
+  <!-- Empty -->
+  <div id="empty" class="empty">
     <div class="empty-icon">
       <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
     </div>
     <div class="empty-h">No matches yet</div>
-    <p class="empty-p">Enter your waste details above and run the matching engine</p>
+    <p class="empty-p">Select a waste category and fill in the details above</p>
   </div>
 
 </div>
 
-<script>
-const DATA = [
-  {company:"GreenLoop Recyclers",loc:"Delhi NCR",qty:1200,score:97,tag:"Certified · High volume",av:"GL",bg:"rgba(42,122,59,.1)",tc:"#1c5229",bar:"#2a7a3b",tier:"top"},
-  {company:"EcoResolve Ltd.",loc:"Gurugram",qty:800,score:91,tag:"Nearby · Fast pickup",av:"ER",bg:"rgba(26,111,168,.1)",tc:"#0e4d7a",bar:"#1a6fa8",tier:"top"},
-  {company:"CleanCycle Hub",loc:"Faridabad",qty:600,score:84,tag:"Flexible schedule",av:"CC",bg:"rgba(120,80,200,.1)",tc:"#5a3a9a",bar:"#7850c8",tier:"good"},
-  {company:"RecoveX Industries",loc:"Noida",qty:2000,score:76,tag:"Bulk specialist",av:"RI",bg:"rgba(184,112,0,.08)",tc:"#7a4a00",bar:"#b87000",tier:"good"},
-  {company:"PrimeMatter Co.",loc:"Greater Noida",qty:300,score:63,tag:"Small batch OK",av:"PM",bg:"rgba(192,57,43,.08)",tc:"#8b1a10",bar:"#c0392b",tier:"possible"}
-];
-let all=[];
+<!-- Footer -->
+<footer style="
+  background: var(--off);
+  border-top: 1px solid var(--border);
+  padding: 2rem;
+  margin-top: 3rem;
+  text-align: center;
+">
+  <button onclick="window.location.href='/dashboard/'" style="
+    padding: 12px 24px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Geist', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  " onmouseover="this.style.background='#155c30'" onmouseout="this.style.background='var(--green)'">
+    Go to Dashboard
+  </button>
+  <p style="
+    margin-top: 1.5rem;
+    font-size: 12px;
+    color: var(--text3);
+  ">WasteMatch Smart Matching Engine © 2026</p>
+</footer>
 
-function run(){
-  const wt=document.getElementById('wt').value;
-  const qty=document.getElementById('qty').value;
-  const err=document.getElementById('err');
-  if(!wt||!qty){
-    err.textContent='Please select a waste type and enter a quantity.';
-    err.style.display='block';return;
-  }
-  err.style.display='none';
-  const btn=document.getElementById('mbtn');
-  document.getElementById('sp').style.display='block';
-  document.getElementById('btext').textContent='Matching…';
-  btn.disabled=true;
+<script>
+  function sendRequest(id, company, location, waste_type, quantity) {
+  // Redirect directly to the request page with the waste ID
+  // The backend will handle loading the waste details
+  window.location.href = `/request/${id}/`;
+}
+// ─────────────────────────────────────────────────────────────────
+//  CONFIG — apni API URL yahan change karo agar zaroori ho
+// ─────────────────────────────────────────────────────────────────
+const API_URL = '/api/smart-match/';
+
+// ─── State ───────────────────────────────────────────────────────
+let all = [];   // last API response, used by filters
+
+// ─── Chip selection ───────────────────────────────────────────────
+function pickChip(el) {
+  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('wt').value = el.dataset.val;
+  hideErr();
+}
+
+// ─── Qty slider ───────────────────────────────────────────────────
+function syncQty(v) {
+  document.getElementById('qtyVal').textContent = Number(v).toLocaleString() + ' kg';
+  document.getElementById('qty').value = v;
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────
+function showErr(msg) {
+  document.getElementById('errText').textContent = msg;
+  document.getElementById('err').style.display = 'flex';
+}
+function hideErr() {
+  document.getElementById('err').style.display = 'none';
+}
+function setLoading(on) {
+  const btn = document.getElementById('mbtn');
+  document.getElementById('sp').style.display   = on ? 'block' : 'none';
+  document.getElementById('btext').textContent   = on ? 'Matching…' : 'Find Best Matches';
+  btn.disabled = on;
+}
+
+// ─── Reset ────────────────────────────────────────────────────────
+function resetForm() {
+  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+  document.getElementById('wt').value        = '';
+  document.getElementById('qtySlider').value = 500;
+  syncQty(500);
+  document.getElementById('loc').value  = '';
+  document.getElementById('urg').value  = '';
+  hideErr();
+  document.getElementById('resSection').classList.add('hidden');
+  document.getElementById('empty').classList.remove('hidden');
+  all = [];
+}
+
+// ─── MAIN — fetch real data ───────────────────────────────────────
+async function run() {
+  const wt  = document.getElementById('wt').value.trim();
+  const qty = document.getElementById('qty').value;
+  const loc = document.getElementById('loc').value.trim();
+  const urg = document.getElementById('urg').value;
+
+  // Validation
+  if (!wt)        { showErr('Pehle ek waste category select karo.'); return; }
+  if (!qty || Number(qty) <= 0) { showErr('Valid quantity enter karo.'); return; }
+  hideErr();
+
+  setLoading(true);
   document.getElementById('empty').classList.add('hidden');
   document.getElementById('resSection').classList.add('hidden');
 
-  setTimeout(()=>{
-    document.getElementById('sp').style.display='none';
-    document.getElementById('btext').textContent='Find Best Matches';
-    btn.disabled=false;
-    all=[...DATA].sort((a,b)=>b.score-a.score);
-    document.querySelectorAll('.ftag').forEach(t=>t.classList.remove('on'));
-    document.querySelector('.ftag').classList.add('on');
+  // Build query string — sirf non-empty params bhejo
+  const params = new URLSearchParams({ waste_type: wt, quantity: qty });
+  if (loc) params.append('location', loc);
+  if (urg) params.append('urgency',  urg);
+
+  try {
+    const res = await fetch(`${API_URL}?${params.toString()}`, {
+      headers: { 'Accept': 'application/json' }
+    });
+
+    if (!res.ok) {
+      // Django error response handle karo
+      let msg = `Server error: ${res.status}`;
+      try {
+        const errData = await res.json();
+        msg = errData.detail || errData.error || errData.message || msg;
+      } catch (_) {}
+      throw new Error(msg);
+    }
+
+    const data = await res.json();
+
+    // Django REST Framework list ya paginated response dono handle karo
+    // Paginated: { count, results: [...] }
+    // Simple list: [...]
+    const items = Array.isArray(data) ? data : (data.results || []);
+
+    if (!Array.isArray(items)) throw new Error('API ne unexpected format diya.');
+
+    // Score ke hisaab se sort karo (descending)
+    all = [...items].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+
+    // Filter tabs reset
+    document.querySelectorAll('.sort-tab').forEach(t => t.classList.remove('on'));
+    document.querySelector('.sort-tab').classList.add('on');
+
     renderList(all);
-  },1100);
+
+  } catch (err) {
+    showErr('⚠ ' + err.message);
+    document.getElementById('empty').classList.remove('hidden');
+  } finally {
+    setLoading(false);
+  }
 }
 
-function doFilter(el,type){
-  document.querySelectorAll('.ftag').forEach(t=>t.classList.remove('on'));
+// ─── FILTER (client-side, on already-fetched data) ────────────────
+function doFilter(el, type) {
+  document.querySelectorAll('.sort-tab').forEach(t => t.classList.remove('on'));
   el.classList.add('on');
-  let d=[...all];
-  if(type==='top') d=d.filter(r=>r.tier==='top');
-  else if(type==='near') d=[...d].sort((a,b)=>a.loc.localeCompare(b.loc));
-  else if(type==='bulk') d=[...d].sort((a,b)=>b.qty-a.qty);
+  let d = [...all];
+  if      (type === 'top')  d = d.filter(r => scoreTier(r.score) === 'top');
+  else if (type === 'near') d = [...d].sort((a, b) => (a.location || a.loc || '').localeCompare(b.location || b.loc || ''));
+  else if (type === 'bulk') d = [...d].sort((a, b) => (b.quantity ?? b.qty ?? 0) - (a.quantity ?? a.qty ?? 0));
   renderList(d);
 }
 
-function renderList(data){
-  const list=document.getElementById('rlist');
-  list.innerHTML='';
-  document.getElementById('cnt').textContent=data.length+' found';
-  if(!data.length){
-    list.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px;">No matches for this filter</div>';
-    document.getElementById('resSection').classList.remove('hidden');return;
+// ─── Score → tier helper ──────────────────────────────────────────
+function scoreTier(score) {
+  if (score >= 80) return 'top';
+  if (score >= 60) return 'good';
+  return 'possible';
+}
+
+// ─── Avatar initials from company name ───────────────────────────
+function initials(name) {
+  if (!name) return '??';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+// ─── Color palette — assigned by index, cycles ───────────────────
+const PALETTES = [
+  { bg:'rgba(26,107,58,.1)',  tc:'#1a6b3a', ring:'#1a6b3a' },
+  { bg:'rgba(21,84,160,.1)',  tc:'#1554a0', ring:'#1554a0' },
+  { bg:'rgba(100,60,180,.1)', tc:'#5a3ab0', ring:'#6440b8' },
+  { bg:'rgba(146,97,10,.1)',  tc:'#7a4a00', ring:'#b87000' },
+  { bg:'rgba(0,128,128,.1)',  tc:'#005f5f', ring:'#007878' },
+  { bg:'rgba(190,58,43,.08)', tc:'#9e2718', ring:'#c0392b' },
+  { bg:'rgba(90,130,20,.1)',  tc:'#4a6810', ring:'#6a8c18' },
+];
+
+// ─── RENDER ───────────────────────────────────────────────────────
+function renderList(data) {
+  const list = document.getElementById('rlist');
+  list.innerHTML = '';
+  document.getElementById('cnt').textContent = data.length + ' found';
+
+  if (!data.length) {
+    list.innerHTML = '<div style="text-align:center;padding:2.5rem;color:var(--text3);font-size:13px;">Koi match nahi mila is filter ke liye.</div>';
+    document.getElementById('resSection').classList.remove('hidden');
+    return;
   }
-  data.forEach((r,i)=>{
-    const sc=r.score>=90?'var(--green)':r.score>=75?'var(--blue)':'var(--amber)';
-    const badgeClass=r.tier==='top'?'badge-top':r.tier==='good'?'badge-good':'badge-pos';
-    const lbl=r.score>=90?'Top pick':r.score>=75?'Good fit':'Possible';
-    const d=document.createElement('div');
-    d.className='rc';
-    d.style.animationDelay=(i*.07)+'s';
-    const isGold=i===0;
-    d.innerHTML=`
-      <div class="rank${isGold?' gold':''}">${isGold?'★':'#'+(i+1)}</div>
-      <div class="avatar" style="background:${r.bg};color:${r.tc}">${r.av}</div>
-      <div class="rinfo">
-        <div class="rname">${r.company}<span class="badge ${badgeClass}">${lbl}</span></div>
-        <div class="rmeta">${r.loc}&nbsp;·&nbsp;${r.qty.toLocaleString()} kg available&nbsp;·&nbsp;${r.tag}</div>
+
+  data.forEach((r, i) => {
+    // ── Field mapping: API fields → display ──────────────────────
+    // Tumhari Django API in fields mein se koi bhi use kar sakti hai:
+    // company / company_name / name
+    // location / loc / city
+    // quantity / qty / available_qty
+    // score / match_score / score_percent
+    // waste_type / category
+    // tags / [] (optional)
+    const company  = r.company      || r.company_name  || r.name         || 'Unknown';
+    const location = r.location     || r.loc            || r.city         || '—';
+    const quantity = r.quantity      || r.qty            || r.available_qty || 0;
+    const score    = r.score         || r.match_score   || r.score_percent || 0;
+    const wtype    = r.waste_type    || r.category       || '';
+    const apiTags  = Array.isArray(r.tags) ? r.tags : [];
+
+    const tier    = scoreTier(score);
+    const palette = PALETTES[i % PALETTES.length];
+    const isGold  = i === 0;
+
+    const tierTag = tier === 'top' ? 'tag-green' : tier === 'good' ? 'tag-blue' : 'tag-amber';
+    const tierLbl = tier === 'top' ? 'Top pick'  : tier === 'good' ? 'Good fit' : 'Possible';
+
+    // SVG ring
+    const circ = Math.PI * 2 * 22;
+    const dash  = (score / 100) * circ;
+
+    // Tags — API se aaye ya auto-generate karo
+    const displayTags = apiTags.length > 0
+      ? apiTags
+      : [wtype, quantity >= 1000 ? 'High Volume' : 'Standard'].filter(Boolean);
+
+    const el = document.createElement('div');
+    el.className = 'rc';
+    el.style.animationDelay = (i * 0.06) + 's';
+    
+    // Escape quotes for onclick handler
+    const escapedCompany = company.replace(/'/g, "\\'");
+    const escapedLocation = location.replace(/'/g, "\\'");
+    const escapedWtype = wtype.replace(/'/g, "\\'");
+    
+    el.innerHTML = `
+      <div class="rc-rank ${isGold ? 'gold' : ''}">${isGold ? '★' : i + 1}</div>
+      <div class="rc-avatar" style="background:${palette.bg};color:${palette.tc}">${initials(company)}</div>
+      <div class="rc-info">
+        <div class="rc-name">
+          ${company}
+          <span class="tag ${tierTag}">${tierLbl}</span>
+        </div>
+        <div class="rc-meta">
+          <span>${location}</span>
+          <span class="meta-sep">·</span>
+          <span>${Number(quantity).toLocaleString()} kg available</span>
+        </div>
+        <div class="rc-tags">
+          ${displayTags.map(t => `<span class="tag ${tierTag}">${t}</span>`).join('')}
+        </div>
+        <button 
+          onclick="sendRequest(${r.id},'${escapedCompany}','${escapedLocation}','${escapedWtype}',${quantity})"
+          style="
+            margin-top:10px;
+            padding:6px 12px;
+            border:none;
+            border-radius:6px;
+            background:#1a6b3a;
+            color:white;
+            cursor:pointer;
+            font-size:12px;
+            font-weight:500;
+            border-radius:6px;
+          ">
+          Request Pickup
+        </button>
       </div>
-      <div class="score-col">
-        <div class="score-num" style="color:${sc}">${r.score}<span class="score-pct">%</span></div>
-        <div class="score-word">match</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${r.score}%;background:${r.bar}"></div></div>
+      <div class="rc-score">
+        <div class="score-ring">
+          <svg viewBox="0 0 56 56" width="56" height="56">
+            <circle class="score-ring-bg" cx="28" cy="28" r="22"/>
+            <circle class="score-ring-fill" cx="28" cy="28" r="22"
+              stroke="${palette.ring}"
+              stroke-dasharray="${circ.toFixed(2)}"
+              stroke-dashoffset="${(circ - dash).toFixed(2)}"/>
+          </svg>
+          <div class="score-ring-text">
+            <span class="score-num" style="color:${palette.ring}">${Math.round(score)}</span>
+            <span class="score-pct">%</span>
+          </div>
+        </div>
       </div>`;
-    list.appendChild(d);
+    list.appendChild(el);
   });
+
   document.getElementById('resSection').classList.remove('hidden');
 }
+
+// ─── Compatibility aliases ────────────────────────────────────────
+(function () {
+  const orig = document.getElementById.bind(document);
+  document.getElementById = function (id) {
+    if (id === 'waste_type') return orig('wt');
+    if (id === 'quantity')   return orig('qty');
+    if (id === 'location')   return orig('loc');
+    if (id === 'results')    return orig('rlist');
+    return orig(id);
+  };
+})();
+function getMatches() { run(); }
 </script>
 </body>
 </html>

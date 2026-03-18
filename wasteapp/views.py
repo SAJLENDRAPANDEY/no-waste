@@ -188,6 +188,7 @@ def request_waste(request, id):
 
         quantity = request.POST.get("quantity")
         message = request.POST.get("message", "")
+        email = request.POST.get("email")
 
         if not quantity or int(quantity) <= 0:
             messages.error(request, "Invalid quantity")
@@ -197,19 +198,46 @@ def request_waste(request, id):
             messages.error(request, f"Only {waste.quantity} available")
             return redirect("request", id=id)
 
-        WasteRequest.objects.create(
+        # ✅ SAVE REQUEST
+        req = WasteRequest.objects.create(
             consumer=request.user,
             waste=waste,
             quantity=int(quantity),
             message=message,
-            email=request.POST.get("email")
+            email=email
         )
 
-        messages.success(request, "Request sent!")
+        # 🔥 SEND EMAIL TO PRODUCER
+        producer_email = waste.producer.email
+
+        subject = "New Waste Request Received 📩"
+
+        message_text = f"""
+Hello {waste.producer.username},
+
+You have received a new waste request.
+
+Company: {waste.company}
+Waste Type: {waste.waste_type}
+Requested Quantity: {quantity} kg
+
+Please login to your dashboard to approve or reject.
+
+Waste-Not Platform
+"""
+
+        send_mail(
+            subject,
+            message_text,
+            settings.EMAIL_HOST_USER,
+            [producer_email],
+            fail_silently=True
+        )
+
+        messages.success(request, "Request sent successfully!")
         return redirect("consumer_page")
 
     return render(request, "request.html", {"waste": waste})
-
 
 # ── APPROVE REQUEST ──────────────────────────────────────
 
@@ -500,22 +528,69 @@ def login_view(request):
     return render(request, "login.html", {"error": error})
 
 
+def calculate_score(waste, required_qty, user_location=None):
+    score = 0
+
+    # 1. Quantity match (50 marks)
+    if waste.quantity >= required_qty:
+        score += 50
+    else:
+        score += (waste.quantity / required_qty) * 50
+
+    # 2. Waste type match (30 marks)
+    # (Assuming exact match already filtered)
+    score += 30
+
+    # 3. Location match (20 marks - optional basic logic)
+    if user_location and waste.location:
+        if user_location.lower() in waste.location.lower():
+            score += 20
+
+    return round(score, 2)
 
 
 
 def smart_match_api(request):
-    error=None
     waste_type = request.GET.get("waste_type")
     quantity = int(request.GET.get("quantity", 0))
     location = request.GET.get("location", "")
 
-    results = get_best_matches(
-        Waste.objects.all(),
-        waste_type,
-        quantity,
-        location
-    )
+    wastes = Waste.objects.all()
 
-    return render(request, "smart_match.html", {"error": error})
+    results = []
+
+    for w in wastes:
+        score = 0
+
+        # type match
+        if w.waste_type == waste_type:
+            score += 50
+
+        # quantity match
+        if w.quantity >= quantity:
+            score += 30
+
+        # location match (simple)
+        if location.lower() in w.location.lower():
+            score += 20
+
+        results.append({
+            "id": w.id,
+            "company": w.company,
+            "waste_type": w.waste_type,
+            "quantity": w.quantity,
+            "location": w.location,
+            "score": score
+        })
+
+    # sort by score
+    results = sorted(results, key=lambda x: x["score"], reverse=True)
+
     return JsonResponse(results, safe=False)
 
+
+def smart_match_page(request):
+    return render(request, 'smart_match.html')
+
+def request_page(request):
+    return render(request, 'request.html')
