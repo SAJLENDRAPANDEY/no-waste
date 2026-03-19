@@ -2,8 +2,8 @@
   "version": 2,
   "builds": [
     {
-      "src": "vercel.py",
-      "use": "@vercel/python@2.15.0"
+      "src": "project/wsgi.py",
+      "use": "@vercel/python@latest"
     }
   ],
   "routes": [
