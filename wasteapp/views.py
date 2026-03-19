@@ -13,11 +13,28 @@ import json
 from django.core.mail import send_mail
 from django.conf import settings
 from django.http import JsonResponse
+import threading
 
 from .ai_matching import get_best_matches
 # from .models import Waste
 
 User = get_user_model()
+
+def send_email_background(subject, message_text, recipient_list):
+    def send():
+        try:
+            send_mail(
+                subject,
+                message_text,
+                settings.EMAIL_HOST_USER,
+                recipient_list,
+                fail_silently=True
+            )
+        except Exception as e:
+            print("Email failed:", e)
+
+    threading.Thread(target=send).start()
+
 
 
 # ── LANDING PAGE ─────────────────────────────────────────
@@ -226,17 +243,9 @@ Please login to your dashboard to approve or reject.
 Waste-Not Platform
 """
 
-        # ✅ SEND MAIL (NOW INSIDE POST)
-        try:
-            send_mail(
-                subject,
-                message_text,
-                settings.EMAIL_HOST_USER,
-                [producer_email],
-                fail_silently=False
-            )
-        except Exception as e:
-            print("Email failed:", e)
+        
+        send_email_background(subject, message_text, [producer_email])
+        
 
         messages.success(request, "Request sent successfully!")
         return redirect("consumer_page")
@@ -335,7 +344,13 @@ Thank you for using Waste-Not.
     )
 
     email.attach_alternative(html_content, "text/html")
-    email.send()
+    def send_html_email():
+        try:
+            email.send()
+        except Exception as e:
+            print("Email failed:", e)
+
+    threading.Thread(target=send_html_email).start()
 
     return redirect("producer_page")
 
@@ -434,7 +449,13 @@ Thank you for using Waste-Not.
     )
 
     email.attach_alternative(html_content, "text/html")
-    email.send()
+    def send_html_email():
+        try:
+            email.send()
+        except Exception as e:
+            print("Email failed:", e)
+
+    threading.Thread(target=send_html_email).start()
 
     return redirect("producer_page")
 
