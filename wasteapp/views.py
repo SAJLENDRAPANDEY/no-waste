@@ -226,13 +226,16 @@ Please login to your dashboard to approve or reject.
 Waste-Not Platform
 """
 
+    try:
         send_mail(
-            subject,
-            message_text,
-            settings.EMAIL_HOST_USER,
-            [producer_email],
-            fail_silently=True
-        )
+        subject,
+        message_text,
+        settings.EMAIL_HOST_USER,
+        [producer_email],
+        fail_silently=False
+    )
+    except Exception as e:
+        print("Email failed:", e)
 
         messages.success(request, "Request sent successfully!")
         return redirect("consumer_page")
