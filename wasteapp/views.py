@@ -207,7 +207,7 @@ def request_waste(request, id):
             email=email
         )
 
-        # 🔥 SEND EMAIL TO PRODUCER
+        # ✅ EMAIL VARIABLES
         producer_email = waste.producer.email
 
         subject = "New Waste Request Received 📩"
@@ -226,16 +226,17 @@ Please login to your dashboard to approve or reject.
 Waste-Not Platform
 """
 
-    try:
-        send_mail(
-        subject,
-        message_text,
-        settings.EMAIL_HOST_USER,
-        [producer_email],
-        fail_silently=False
-    )
-    except Exception as e:
-        print("Email failed:", e)
+        # ✅ SEND MAIL (NOW INSIDE POST)
+        try:
+            send_mail(
+                subject,
+                message_text,
+                settings.EMAIL_HOST_USER,
+                [producer_email],
+                fail_silently=False
+            )
+        except Exception as e:
+            print("Email failed:", e)
 
         messages.success(request, "Request sent successfully!")
         return redirect("consumer_page")
