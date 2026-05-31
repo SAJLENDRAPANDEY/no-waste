@@ -106,7 +106,7 @@ python manage.py runserver
 
 ## 🌐 Live Demo
 
-👉 https://your-app.onrender.com
+👉[ https://your-app.onrender.com](https://no-waste-lbks.onrender.com/)
 
 ---
 
